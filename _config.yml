@@ -1,0 +1,8 @@
+# Site settings
+title: Meta-x86
+url: "http://budevg.github.io"
+
+# Build settings
+markdown: redcarpet
+redcarpet:
+  extensions: ["tables", "autolink", "strikethrough", "fenced_code_blocks"]
