@@ -1,7 +1,7 @@
 ---
-layout: post
-title: My New Git-based Blog
-author: Evgeny Budilovsky
+layout:   post
+title:    My New Git-based Blog
+date:     2015-02-27
 ---
 
 It is time to try new things. Blogger was an excellent platform but writing

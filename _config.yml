@@ -1,8 +1,59 @@
 # Site settings
-title: Meta-x86
-url: "http://budevg.github.io"
+title:       Meta-x86
+# email:       your_email@example.com
+author:      Evgeny Budilovsky
+description: "Blog about programming, technology and life."
+baseurl:     ""
+url:         "http://budevg.github.io"
+date_format: "%b %-d, %Y"
+
+# Google services
+google_analytics:
+google_verification:
+
+# Optional features
+animated:             false
+show_related_posts:   false
+show_post_footers:    false
+show_social_icons:    true
+ajaxify_contact_form: false
+
+# Disqus post comments
+# (leave blank to disable Disqus)
+disqus_shortname:
+
+# Social icons
+github_username: budevg
+bitbucket_username:
+stackoverflow_id:
+twitter_username: budevg
+google_plus_id: +EvgenyBudilovsky
+linkedin_username: budevg
+angellist_username:
+medium_id:
+bitcoin_url:
+paypal_url:
+flattr_button:
+
+# Post sharing icons
+show_sharing_icons: false
+share_text: 'Share this post!'
+# Change to 'true' to enable individual icons
+share_facebook: false
+share_twitter: false
+share_googleplus: false
+share_linkedin: false
+share_digg: false
+share_tumblr: false
+share_reddit: false
+share_stumbleupon: false
+share_hackernews: false
 
 # Build settings
-markdown: redcarpet
+markdown:     kramdown
 redcarpet:
-  extensions: ["tables", "autolink", "strikethrough", "fenced_code_blocks"]
+  extensions: ['smart', 'tables', 'with_toc_data']
+permalink:    pretty
+paginate:     4
+sass:
+  compressed: true
