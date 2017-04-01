@@ -2,13 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"
     xmlns:dc="http://purl.org/dc/elements/1.1/">
     <channel>
-        <title>Meta-X86</title>
+        <title>Meta-x86</title>
         <link>http://budevg.github.io</link>
         <description><![CDATA[Blog of Evgeny Budilovsky]]></description>
         <atom:link href="http://budevg.github.io/feed.xml" rel="self"
                    type="application/rss+xml" />
-        <lastBuildDate>Thu, 14 Jan 2016 00:00:00 UT</lastBuildDate>
+        <lastBuildDate>Fri, 31 Mar 2017 00:00:00 UT</lastBuildDate>
         <item>
+    <title>World Of Podcasts</title>
+    <link>http://budevg.github.io/posts/podcasts/2017/03/31/podcast-world.html</link>
+    <description><![CDATA[]]></description>
+    <pubDate>Fri, 31 Mar 2017 00:00:00 UT</pubDate>
+    <guid>http://budevg.github.io/posts/podcasts/2017/03/31/podcast-world.html</guid>
+    <dc:creator>Evgeny Budilovsky</dc:creator>
+</item>
+<item>
     <title>Storage presentation in Kernel TLV meetup</title>
     <link>http://budevg.github.io/posts/presentations/2016/01/14/storage-kernel-meetup.html</link>
     <description><![CDATA[]]></description>
