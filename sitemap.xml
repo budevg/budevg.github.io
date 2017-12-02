@@ -2,6 +2,10 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
     <url>
+        <loc>http://budevg.github.io/posts/virtualization/2017/12/01/virt-lifecycle.html</loc>
+    </url>
+
+    <url>
         <loc>http://budevg.github.io/posts/tutorials/2017/04/29/rdma-101-1.html</loc>
     </url>
 
