@@ -501,6 +501,11 @@ pre.sourceCode span.er
   font-weight : 600;
 }
 
+a.sourceLine
+{
+  border-bottom : none;
+}
+
 
 /* Generated with Clay, http://fvisser.nl/clay */
         </style>
@@ -592,133 +597,141 @@ tags&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= [&quot;<a href="../../../../../tags/storage.
 <h1 id="virtual-environment">Virtual environment</h1>
 <h2 id="base-image">Base image</h2>
 <p>We start with ubuntu 16.04.2 qemu image. It has linux kernel 4.8 installed and a basic development tools</p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="fu">sudo</span> apt-get install linux-generic-hwe-16.04 build-essential \
-                       automake autoconf libtool</code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" data-line-number="1">$ <span class="fu">sudo</span> apt-get install linux-generic-hwe-16.04 build-essential \</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2">                       automake autoconf libtool</a></code></pre></div>
 <p>Let’s call this image <code>ubuntu-16.04.2-dev</code>. We are going to create another image based on this image with all the rdma stack installed on it called <code>ubuntu-rdma.qcow2</code></p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="ex">qemu-img</span> create -f qcow2 -b ubuntu-16.04.2-dev ubuntu-rdma.qcow2
-<span class="ex">Formatting</span> <span class="st">'ubuntu-rdma.qcow2'</span> ...</code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" data-line-number="1">$ <span class="ex">qemu-img</span> create -f qcow2 -b ubuntu-16.04.2-dev ubuntu-rdma.qcow2</a>
+<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="ex">Formatting</span> <span class="st">'ubuntu-rdma.qcow2'</span> ...</a></code></pre></div>
 <p>Let’s start a guest and install RDMA stack inside of it.</p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">kvm</span> -m 1G \
--netdev user,hostfwd=tcp::5555-:22,id=net0 \
--device virtio-net-pci,netdev=net0 \
--drive if=virtio,file=ubuntu-rdma.qcow2,cache=unsafe</code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="ex">kvm</span> -m 1G \</a>
+<a class="sourceLine" id="cb3-2" data-line-number="2">-netdev user,hostfwd=tcp::5555-:22,id=net0 \</a>
+<a class="sourceLine" id="cb3-3" data-line-number="3">-device virtio-net-pci,netdev=net0 \</a>
+<a class="sourceLine" id="cb3-4" data-line-number="4">-drive if=virtio,file=ubuntu-rdma.qcow2,cache=unsafe</a></code></pre></div>
 <p>We can ssh to guest through local port 5555 which is redirected to port 22 on guest.</p>
 <h2 id="install-rdma-libraries-and-tools">Install RDMA libraries and tools</h2>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="fu">sudo</span> apt-get install libibverbs-dev librdmacm-dev \
-                       rdmacm-utils perftest ibverbs-utils</code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" data-line-number="1">$ <span class="fu">sudo</span> apt-get install libibverbs-dev librdmacm-dev \</a>
+<a class="sourceLine" id="cb4-2" data-line-number="2">                       rdmacm-utils perftest ibverbs-utils</a></code></pre></div>
 <h2 id="install-softiwarp">Install SoftiWARP</h2>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="fu">git</span> clone https://github.com/zrlio/softiwarp.git
-<span class="ex">...</span>
-$ <span class="bu">pushd</span> softiwarp/kernel
-$ <span class="fu">make</span>
-$ <span class="fu">sudo</span> mkdir -p /lib/modules/<span class="kw">`</span><span class="fu">uname</span> -r<span class="kw">`</span>/kernel/extra
-$ <span class="fu">sudo</span> cp siw.ko /lib/modules/<span class="kw">`</span><span class="fu">uname</span> -r<span class="kw">`</span>/kernel/extra
-$ <span class="fu">sudo</span> depmod -a
-$ <span class="bu">popd</span>
-$ <span class="bu">pushd</span> softiwarp/userlib
-$ <span class="ex">./autogen.sh</span> <span class="kw">&amp;&amp;</span> <span class="ex">./configure</span> --prefix= <span class="kw">&amp;&amp;</span> <span class="fu">make</span> <span class="kw">&amp;&amp;</span> <span class="fu">sudo</span> make install</code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" data-line-number="1">$ <span class="fu">git</span> clone https://github.com/zrlio/softiwarp.git</a>
+<a class="sourceLine" id="cb5-2" data-line-number="2"><span class="ex">...</span></a>
+<a class="sourceLine" id="cb5-3" data-line-number="3">$ <span class="bu">pushd</span> softiwarp/kernel</a>
+<a class="sourceLine" id="cb5-4" data-line-number="4">$ <span class="fu">make</span></a>
+<a class="sourceLine" id="cb5-5" data-line-number="5">$ <span class="fu">sudo</span> mkdir -p /lib/modules/<span class="kw">`</span><span class="fu">uname</span> -r<span class="kw">`</span>/kernel/extra</a>
+<a class="sourceLine" id="cb5-6" data-line-number="6">$ <span class="fu">sudo</span> cp siw.ko /lib/modules/<span class="kw">`</span><span class="fu">uname</span> -r<span class="kw">`</span>/kernel/extra</a>
+<a class="sourceLine" id="cb5-7" data-line-number="7">$ <span class="fu">sudo</span> depmod -a</a>
+<a class="sourceLine" id="cb5-8" data-line-number="8">$ <span class="bu">popd</span></a>
+<a class="sourceLine" id="cb5-9" data-line-number="9">$ <span class="bu">pushd</span> softiwarp/userlib</a>
+<a class="sourceLine" id="cb5-10" data-line-number="10">$ <span class="ex">./autogen.sh</span> <span class="kw">&amp;&amp;</span> <span class="ex">./configure</span> --prefix= <span class="kw">&amp;&amp;</span> <span class="fu">make</span> <span class="kw">&amp;&amp;</span> <span class="fu">sudo</span> make install</a></code></pre></div>
 <h2 id="shutdown">Shutdown</h2>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="fu">sudo</span> shutdown -h now</code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="fu">sudo</span> shutdown -h now</a></code></pre></div>
 <h2 id="create-two-guests">Create two guests</h2>
 <p>Based on the <code>ubuntu-rdma.qcow2</code> image we just created let’s build two images <code>vm1.qcow2</code> and <code>vm2.qcow2</code></p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="kw">for</span> <span class="ex">i</span> in <span class="dt">{1..2}</span><span class="kw">;</span> <span class="kw">do</span> <span class="ex">qemu-img</span> create -f qcow2 -b ubuntu-rdma.qcow2 vm<span class="va">${i}</span>.qcow2<span class="kw">;</span> <span class="kw">done</span>
-$ <span class="fu">ls</span> vm*
-<span class="ex">vm1.qcow2</span>  vm2.qcow2</code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb7-1" data-line-number="1">$ <span class="kw">for</span> <span class="ex">i</span> in <span class="dt">{1..2}</span><span class="kw">;</span> <span class="kw">do</span> <span class="ex">qemu-img</span> create -f qcow2 -b ubuntu-rdma.qcow2 vm<span class="va">${i}</span>.qcow2<span class="kw">;</span> <span class="kw">done</span></a>
+<a class="sourceLine" id="cb7-2" data-line-number="2">$ <span class="fu">ls</span> vm*</a>
+<a class="sourceLine" id="cb7-3" data-line-number="3"><span class="ex">vm1.qcow2</span>  vm2.qcow2</a></code></pre></div>
 <p>Now we are going to run both guest. Each of them will have two network interfaces. The first interface is configured to allow access from the guest to the internet and to allow access from the host to the guest’s ssh service by connecting to local port 5551 (or 5552 for second vm). The second network interface will be used for rdma access we are going to use qemu’s feature to create network using UDP multicast socket.</p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">for</span> <span class="ex">i</span> in <span class="dt">{1..2}</span>
-<span class="kw">do</span>
-  <span class="ex">kvm</span> -name vm<span class="va">${i}</span> -m 1G \
-      -netdev user,hostfwd=tcp::555<span class="va">${i}</span>-:22,id=net0 \
-      -device virtio-net-pci,netdev=net0 \
-      -netdev socket,mcast=230.0.0.1:1234,id=net1 \
-      -device virtio-net-pci,mac=52:54:00:12:34:0<span class="va">${i}</span>,netdev=net1 \
-      -drive if=virtio,file=vm<span class="va">${i}</span>.qcow2,cache=unsafe <span class="kw">&amp;</span>
-<span class="kw">done</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="kw">for</span> <span class="ex">i</span> in <span class="dt">{1..2}</span></a>
+<a class="sourceLine" id="cb8-2" data-line-number="2"><span class="kw">do</span></a>
+<a class="sourceLine" id="cb8-3" data-line-number="3">  <span class="ex">kvm</span> -name vm<span class="va">${i}</span> -m 1G \</a>
+<a class="sourceLine" id="cb8-4" data-line-number="4">      -netdev user,hostfwd=tcp::555<span class="va">${i}</span>-:22,id=net0 \</a>
+<a class="sourceLine" id="cb8-5" data-line-number="5">      -device virtio-net-pci,netdev=net0 \</a>
+<a class="sourceLine" id="cb8-6" data-line-number="6">      -netdev socket,mcast=230.0.0.1:1234,id=net1 \</a>
+<a class="sourceLine" id="cb8-7" data-line-number="7">      -device virtio-net-pci,mac=52:54:00:12:34:0<span class="va">${i}</span>,netdev=net1 \</a>
+<a class="sourceLine" id="cb8-8" data-line-number="8">      -drive if=virtio,file=vm<span class="va">${i}</span>.qcow2,cache=unsafe <span class="kw">&amp;</span></a>
+<a class="sourceLine" id="cb8-9" data-line-number="9"><span class="kw">done</span></a></code></pre></div>
 <p>Now login to each of the machines and set hostname and ip for the rdma nic:</p>
 <ul>
-<li><p>vm1</p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="fu">ssh</span> -p 5551 localhost
-<span class="ex">vm1</span> $ sudo bash -c <span class="st">'echo 127.0.0.1 vm1 &gt;&gt; /etc/hosts'</span>
-<span class="ex">vm1</span> $ sudo hostnamectl set-hostname vm1
-<span class="ex">vm1</span> $ sudo su
-<span class="ex">vm1</span> $ cat <span class="op">&lt;&lt; EOF</span> <span class="op">&gt;&gt;</span> <span class="ex">/etc/network/interfaces</span>
-auto ens4
-iface ens4 inet <span class="op">s</span><span class="ex">tatic</span>
-  address 10.0.0.1
-  netmask 255.255.255.0
-EOF
-vm1 $ ifup ens4
-vm1 $ exit
-vm1 $ exit</code></pre></div></li>
-<li><p>vm2</p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="fu">ssh</span> -p 5552 localhost
-<span class="ex">vm2</span> $ sudo bash -c <span class="st">'echo 127.0.0.1 vm2 &gt;&gt; /etc/hosts'</span>
-<span class="ex">vm2</span> $ sudo hostnamectl set-hostname vm2
-<span class="ex">vm2</span> $ sudo su
-<span class="ex">vm2</span> $ cat <span class="op">&lt;&lt; EOF</span> <span class="op">&gt;&gt;</span> <span class="ex">/etc/network/interfaces</span>
-auto ens4
-iface ens4 inet <span class="op">s</span><span class="ex">tatic</span>
-  address 10.0.0.2
-  netmask 255.255.255.0
-EOF
-vm2 $ ifup ens4
-vm2 $ exit
-vm2 $ exit</code></pre></div></li>
+<li>vm1</li>
 </ul>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="fu">ssh</span> -p 5551 localhost</a>
+<a class="sourceLine" id="cb9-2" data-line-number="2"><span class="ex">vm1</span> $ sudo bash -c <span class="st">'echo 127.0.0.1 vm1 &gt;&gt; /etc/hosts'</span></a>
+<a class="sourceLine" id="cb9-3" data-line-number="3"><span class="ex">vm1</span> $ sudo hostnamectl set-hostname vm1</a>
+<a class="sourceLine" id="cb9-4" data-line-number="4"><span class="ex">vm1</span> $ sudo su</a>
+<a class="sourceLine" id="cb9-5" data-line-number="5"><span class="ex">vm1</span> $ cat <span class="op">&lt;&lt; EOF</span> <span class="op">&gt;&gt;</span> <span class="ex">/etc/network/interfaces</span></a>
+<a class="sourceLine" id="cb9-6" data-line-number="6">auto ens4</a>
+<a class="sourceLine" id="cb9-7" data-line-number="7">iface ens4 inet <span class="op">s</span><span class="ex">tatic</span></a>
+<a class="sourceLine" id="cb9-8" data-line-number="8">  address 10.0.0.1</a>
+<a class="sourceLine" id="cb9-9" data-line-number="9">  netmask 255.255.255.0</a>
+<a class="sourceLine" id="cb9-10" data-line-number="10">EOF</a>
+<a class="sourceLine" id="cb9-11" data-line-number="11">vm1 $ ifup ens4</a>
+<a class="sourceLine" id="cb9-12" data-line-number="12">vm1 $ exit</a>
+<a class="sourceLine" id="cb9-13" data-line-number="13">vm1 $ exit</a></code></pre></div>
+<ul>
+<li>vm2</li>
+</ul>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="fu">ssh</span> -p 5552 localhost</a>
+<a class="sourceLine" id="cb10-2" data-line-number="2"><span class="ex">vm2</span> $ sudo bash -c <span class="st">'echo 127.0.0.1 vm2 &gt;&gt; /etc/hosts'</span></a>
+<a class="sourceLine" id="cb10-3" data-line-number="3"><span class="ex">vm2</span> $ sudo hostnamectl set-hostname vm2</a>
+<a class="sourceLine" id="cb10-4" data-line-number="4"><span class="ex">vm2</span> $ sudo su</a>
+<a class="sourceLine" id="cb10-5" data-line-number="5"><span class="ex">vm2</span> $ cat <span class="op">&lt;&lt; EOF</span> <span class="op">&gt;&gt;</span> <span class="ex">/etc/network/interfaces</span></a>
+<a class="sourceLine" id="cb10-6" data-line-number="6">auto ens4</a>
+<a class="sourceLine" id="cb10-7" data-line-number="7">iface ens4 inet <span class="op">s</span><span class="ex">tatic</span></a>
+<a class="sourceLine" id="cb10-8" data-line-number="8">  address 10.0.0.2</a>
+<a class="sourceLine" id="cb10-9" data-line-number="9">  netmask 255.255.255.0</a>
+<a class="sourceLine" id="cb10-10" data-line-number="10">EOF</a>
+<a class="sourceLine" id="cb10-11" data-line-number="11">vm2 $ ifup ens4</a>
+<a class="sourceLine" id="cb10-12" data-line-number="12">vm2 $ exit</a>
+<a class="sourceLine" id="cb10-13" data-line-number="13">vm2 $ exit</a></code></pre></div>
 <p>Make sure that your host firewall is not blocking the udp broadcast over port 1234</p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="fu">sudo</span> iptables -A INPUT -p udp --dport 1234 -j ACCEPT</code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb11-1" data-line-number="1">$ <span class="fu">sudo</span> iptables -A INPUT -p udp --dport 1234 -j ACCEPT</a></code></pre></div>
 <h2 id="check-tcp-connectivity">Check tcp connectivity</h2>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">vm1</span> $ ping 10.0.0.2
-<span class="ex">PING</span> 10.0.0.2 (10.0.0.2) <span class="ex">56</span>(84) <span class="ex">bytes</span> of data.
-<span class="ex">64</span> bytes from 10.0.0.2: icmp_seq=1 ttl=64 time=0.671 ms
-<span class="ex">64</span> bytes from 10.0.0.2: icmp_seq=2 ttl=64 time=0.776 ms</code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb12-1" data-line-number="1"><span class="ex">vm1</span> $ ping 10.0.0.2</a>
+<a class="sourceLine" id="cb12-2" data-line-number="2"><span class="ex">PING</span> 10.0.0.2 (10.0.0.2) <span class="ex">56</span>(84) <span class="ex">bytes</span> of data.</a>
+<a class="sourceLine" id="cb12-3" data-line-number="3"><span class="ex">64</span> bytes from 10.0.0.2: icmp_seq=1 ttl=64 time=0.671 ms</a>
+<a class="sourceLine" id="cb12-4" data-line-number="4"><span class="ex">64</span> bytes from 10.0.0.2: icmp_seq=2 ttl=64 time=0.776 ms</a></code></pre></div>
 <h2 id="check-rdma-connectivity">Check RDMA connectivity</h2>
 <ul>
-<li><p>vm1</p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">vm1</span> $ sudo modprobe -a siw rdma_ucm
-<span class="ex">vm1</span> $ rping -s -a 10.0.0.1 -v
-<span class="ex">server</span> ping data: rdma-ping-0: ABCDEFGHIJKLMNOPQRSTUVWXYZ[<span class="dt">\]</span>^_<span class="kw">`</span><span class="ex">abcdefghijklmnopqr</span>
-<span class="ex">server</span> ping data: rdma-ping-1: BCDEFGHIJKLMNOPQRSTUVWXYZ[<span class="dt">\]</span>^_<span class="kw">`</span>abcdefghijklmnopqrs
-<span class="ex">server</span> DISCONNECT EVENT...
-<span class="bu">wait</span> for RDMA_READ_ADV state 10</code></pre></div></li>
-<li><p>vm2</p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">vm2</span> $ sudo modprobe -a siw rdma_ucm
-<span class="ex">vm2</span> $ rping -c -a 10.0.0.1 -C 2 -v
-<span class="fu">ping</span> data: rdma-ping-0: ABCDEFGHIJKLMNOPQRSTUVWXYZ[<span class="dt">\]</span>^_<span class="kw">`</span><span class="ex">abcdefghijklmnopqr</span>
-<span class="fu">ping</span> data: rdma-ping-1: BCDEFGHIJKLMNOPQRSTUVWXYZ[<span class="dt">\]</span>^_<span class="kw">`</span>abcdefghijklmnopqrs</code></pre></div></li>
+<li>vm1</li>
 </ul>
+<div class="sourceCode" id="cb13"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="ex">vm1</span> $ sudo modprobe -a siw rdma_ucm</a>
+<a class="sourceLine" id="cb13-2" data-line-number="2"><span class="ex">vm1</span> $ rping -s -a 10.0.0.1 -v</a>
+<a class="sourceLine" id="cb13-3" data-line-number="3"><span class="ex">server</span> ping data: rdma-ping-0: ABCDEFGHIJKLMNOPQRSTUVWXYZ[<span class="dt">\]</span>^_<span class="kw">`</span><span class="ex">abcdefghijklmnopqr</span></a>
+<a class="sourceLine" id="cb13-4" data-line-number="4"><span class="ex">server</span> ping data: rdma-ping-1: BCDEFGHIJKLMNOPQRSTUVWXYZ[<span class="dt">\]</span>^_<span class="kw">`</span>abcdefghijklmnopqrs</a>
+<a class="sourceLine" id="cb13-5" data-line-number="5"><span class="ex">server</span> DISCONNECT EVENT...</a>
+<a class="sourceLine" id="cb13-6" data-line-number="6"><span class="bu">wait</span> for RDMA_READ_ADV state 10</a></code></pre></div>
+<ul>
+<li>vm2</li>
+</ul>
+<div class="sourceCode" id="cb14"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb14-1" data-line-number="1"><span class="ex">vm2</span> $ sudo modprobe -a siw rdma_ucm</a>
+<a class="sourceLine" id="cb14-2" data-line-number="2"><span class="ex">vm2</span> $ rping -c -a 10.0.0.1 -C 2 -v</a>
+<a class="sourceLine" id="cb14-3" data-line-number="3"><span class="fu">ping</span> data: rdma-ping-0: ABCDEFGHIJKLMNOPQRSTUVWXYZ[<span class="dt">\]</span>^_<span class="kw">`</span><span class="ex">abcdefghijklmnopqr</span></a>
+<a class="sourceLine" id="cb14-4" data-line-number="4"><span class="fu">ping</span> data: rdma-ping-1: BCDEFGHIJKLMNOPQRSTUVWXYZ[<span class="dt">\]</span>^_<span class="kw">`</span>abcdefghijklmnopqrs</a></code></pre></div>
 <h2 id="check-rdma-bandwidth-and-latency">Check RDMA bandwidth and latency</h2>
 <h3 id="bandwidth">Bandwidth</h3>
 <ul>
-<li><p>vm1</p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">vm1</span> $ ibv_devices
-<span class="ex">device</span>          	   node GUID
-<span class="ex">------</span>          	----------------
-<span class="ex">siw_ens3</span>        	5254001234560000
-<span class="ex">siw_lo</span>          	7369775f6c6f0000
-<span class="ex">siw_ens4</span>        	5254001234010000
-<span class="ex">vm1</span> $ sudo su
-<span class="ex">vm1</span> $ ulimit -l unlimited
-<span class="ex">vm1</span> $ ib_write_bw -R -d siw_ens4 -i 1  -D 10 -F</code></pre></div></li>
-<li><p>vm2</p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">vm2</span> $ sudo su
-<span class="ex">vm2</span> $ ulimit -l unlimited
-<span class="ex">vm2</span> $ ib_write_bw -R -d siw_ens4 -i 1 -D 10 -F 10.0.0.1
-<span class="ex">...</span>
- <span class="co">#bytes     #iterations    BW peak[MB/sec]    BW average[MB/sec]   MsgRate[Mpps]</span>
- <span class="ex">65536</span>      3200             0.00               33.33  		   0.000533</code></pre></div></li>
+<li>vm1</li>
 </ul>
+<div class="sourceCode" id="cb15"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb15-1" data-line-number="1"><span class="ex">vm1</span> $ ibv_devices</a>
+<a class="sourceLine" id="cb15-2" data-line-number="2">    <span class="ex">device</span>          	   node GUID</a>
+<a class="sourceLine" id="cb15-3" data-line-number="3">    <span class="ex">------</span>          	----------------</a>
+<a class="sourceLine" id="cb15-4" data-line-number="4">    <span class="ex">siw_ens3</span>        	5254001234560000</a>
+<a class="sourceLine" id="cb15-5" data-line-number="5">    <span class="ex">siw_lo</span>          	7369775f6c6f0000</a>
+<a class="sourceLine" id="cb15-6" data-line-number="6">    <span class="ex">siw_ens4</span>        	5254001234010000</a>
+<a class="sourceLine" id="cb15-7" data-line-number="7"><span class="ex">vm1</span> $ sudo su</a>
+<a class="sourceLine" id="cb15-8" data-line-number="8"><span class="ex">vm1</span> $ ulimit -l unlimited</a>
+<a class="sourceLine" id="cb15-9" data-line-number="9"><span class="ex">vm1</span> $ ib_write_bw -R -d siw_ens4 -i 1  -D 10 -F</a></code></pre></div>
+<ul>
+<li>vm2</li>
+</ul>
+<div class="sourceCode" id="cb16"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb16-1" data-line-number="1"><span class="ex">vm2</span> $ sudo su</a>
+<a class="sourceLine" id="cb16-2" data-line-number="2"><span class="ex">vm2</span> $ ulimit -l unlimited</a>
+<a class="sourceLine" id="cb16-3" data-line-number="3"><span class="ex">vm2</span> $ ib_write_bw -R -d siw_ens4 -i 1 -D 10 -F 10.0.0.1</a>
+<a class="sourceLine" id="cb16-4" data-line-number="4"><span class="ex">...</span></a>
+<a class="sourceLine" id="cb16-5" data-line-number="5"> <span class="co">#bytes     #iterations    BW peak[MB/sec]    BW average[MB/sec]   MsgRate[Mpps]</span></a>
+<a class="sourceLine" id="cb16-6" data-line-number="6"> <span class="ex">65536</span>      3200             0.00               33.33  		   0.000533</a></code></pre></div>
 <p>The results are really lame but please remember we are using virtual environment so performance is always bad here</p>
 <h3 id="latency">Latency</h3>
 <ul>
-<li><p>vm1</p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">vm1</span> $ ib_write_lat -R -d siw_ens4 -i 1  -D 10 -F</code></pre></div></li>
-<li><p>vm2</p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">vm2</span> $ ib_write_lat -R -d siw_ens4 -i 1 -D 10 -F 10.0.0.1
-<span class="ex">...</span>
- <span class="co">#bytes        #iterations       t_avg[usec]</span>
- <span class="ex">2</span>             4316            695.11</code></pre></div></li>
+<li>vm1</li>
 </ul>
+<div class="sourceCode" id="cb17"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb17-1" data-line-number="1"><span class="ex">vm1</span> $ ib_write_lat -R -d siw_ens4 -i 1  -D 10 -F</a></code></pre></div>
+<ul>
+<li>vm2</li>
+</ul>
+<div class="sourceCode" id="cb18"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb18-1" data-line-number="1"><span class="ex">vm2</span> $ ib_write_lat -R -d siw_ens4 -i 1 -D 10 -F 10.0.0.1</a>
+<a class="sourceLine" id="cb18-2" data-line-number="2"><span class="ex">...</span></a>
+<a class="sourceLine" id="cb18-3" data-line-number="3"> <span class="co">#bytes        #iterations       t_avg[usec]</span></a>
+<a class="sourceLine" id="cb18-4" data-line-number="4"> <span class="ex">2</span>             4316            695.11</a></code></pre></div>
 <p>Same lame results due to the nature of our virtual setup and the use of softiwarp instead of real RDMA capable hardware</p>
 <h1 id="summary">Summary</h1>
 <p>Now we have a working setup of two vm’s which can communicate using RDMA. In the next posts we are going to explore more interesting RDMA stuff.</p>
