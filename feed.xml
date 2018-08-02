@@ -7,8 +7,16 @@
         <description><![CDATA[Blog of Evgeny Budilovsky]]></description>
         <atom:link href="http://budevg.github.io/feed.xml" rel="self"
                    type="application/rss+xml" />
-        <lastBuildDate>Fri, 20 Jul 2018 00:00:00 UT</lastBuildDate>
+        <lastBuildDate>Thu, 02 Aug 2018 00:00:00 UT</lastBuildDate>
         <item>
+    <title>Cross compiling inside docker</title>
+    <link>http://budevg.github.io/posts/docker/2018/08/02/docker-cross-compile.html</link>
+    <description><![CDATA[]]></description>
+    <pubDate>Thu, 02 Aug 2018 00:00:00 UT</pubDate>
+    <guid>http://budevg.github.io/posts/docker/2018/08/02/docker-cross-compile.html</guid>
+    <dc:creator>Evgeny Budilovsky</dc:creator>
+</item>
+<item>
     <title>Scratch space using tmpfs and friends</title>
     <link>http://budevg.github.io/posts/tools/2018/07/20/scratch-space.html</link>
     <description><![CDATA[]]></description>

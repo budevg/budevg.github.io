@@ -1,0 +1,683 @@
+<!DOCTYPE HTML>
+
+<html>
+    <head>
+        <title>
+            Cross compiling inside docker
+        </title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content>
+        <meta name="author" content>
+        <link rel="icon" type="image/png" href="../../../../../static/images/pencil.ico">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js">
+            
+        </script>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.5/css/bootstrap.min.css">
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.5/js/bootstrap.min.js">
+            
+        </script>
+        <style>
+            
+@import url(https://fonts.googleapis.com/css?family=Roboto+Condensed:400,400i,700|Roboto+Mono:400,400i,700&subset=cyrillic);
+body
+{
+  font-family      : "Roboto Condensed", sans-serif;
+  font-size        : 18px;
+  background-color : #f6f6f6;
+  background-image : url("/static/images/satinweave.png");
+}
+
+a:hover
+{
+  color : black !important;
+}
+
+a:link
+{
+  color : black !important;
+}
+
+a:visited
+{
+  color : black !important;
+}
+
+a:active
+{
+  color : black !important;
+}
+
+.footer
+{
+  margin         : 0px auto 0px auto;
+  max-width      : 86%;
+  padding-top    : 70px;
+  padding-bottom : 50px;
+  color          : #777777;
+  font-size      : 94%;
+}
+
+.left
+{
+  text-align : left;
+}
+
+.right
+{
+  text-align : right;
+}
+
+.center
+{
+  text-align : center;
+}
+
+h1
+{
+  text-align     : center;
+  font-size      : 200%;
+  padding-top    : 30px;
+  padding-bottom : 30px;
+}
+
+h2
+{
+  font-size      : 160%;
+  padding-top    : 30px;
+  padding-bottom : 25px;
+}
+
+h3
+{
+  font-size      : 140%;
+  padding-top    : 25px;
+  padding-bottom : 20px;
+}
+
+a
+{
+  color           : #2d3644;
+  text-decoration : none;
+  border-bottom   : dotted 1px #333333;
+}
+
+a:hover
+{
+  color           : #5493ff;
+  text-decoration : none;
+  border-bottom   : solid 1px #999999;
+}
+
+a:visited
+{
+  color           : #2d3644;
+  text-decoration : none;
+  border-bottom   : dotted 1px #333333;
+}
+
+a:active
+{
+  color           : #2d3644;
+  text-decoration : none;
+  border-bottom   : dotted 1px #333333;
+}
+
+.href-to-original
+{
+  text-align  : right;
+  font-size   : 90%;
+  padding-top : 10px;
+}
+
+#authors-link
+{
+  text-decoration : none;
+  border-bottom   : solid 0px #ffffff;
+}
+
+#about-link
+{
+  text-decoration : none;
+  border-bottom   : solid 0px #ffffff;
+}
+
+#tags-link
+{
+  text-decoration : none;
+  border-bottom   : solid 0px #ffffff;
+}
+
+#categories-link
+{
+  text-decoration : none;
+  border-bottom   : solid 0px #ffffff;
+}
+
+#sl-1
+{
+  text-decoration : none;
+  border-bottom   : solid 0px #ffffff;
+}
+
+#sl-2
+{
+  text-decoration : none;
+  border-bottom   : solid 0px #ffffff;
+}
+
+#sl-3
+{
+  text-decoration : none;
+  border-bottom   : solid 0px #ffffff;
+}
+
+#sl-4
+{
+  text-decoration : none;
+  border-bottom   : solid 0px #ffffff;
+}
+
+#sl-5
+{
+  text-decoration : none;
+  border-bottom   : solid 0px #ffffff;
+}
+
+#go-home
+{
+  text-decoration : none;
+  border-bottom   : solid 0px #ffffff;
+}
+
+#hakyll-link
+{
+  text-decoration : none;
+  border-bottom   : solid 0px #ffffff;
+}
+
+#mit-link
+{
+  text-decoration : none;
+  border-bottom   : solid 0px #ffffff;
+}
+
+.fpconf-link
+{
+  font-size : 120%;
+}
+
+.fby-link
+{
+  font-size : 120%;
+}
+
+.friends-separator
+{
+  padding-left : 30px;
+}
+
+.navigation
+{
+  max-width      : 86%;
+  margin         : 0px auto 0px auto;
+  padding-top    : 40px;
+  padding-bottom : 40px;
+  font-size      : 120%;
+}
+
+.links
+{
+  margin-top     : 17px;
+  font-size      : 90%;
+  padding-bottom : 10px;
+}
+
+.logo-area
+{
+  text-align : center;
+}
+
+.social-links
+{
+  text-align : right;
+  margin-top : 10px;
+  font-size  : 140%;
+}
+
+.social-links-separator
+{
+  padding-right : 20px;
+}
+
+.links-separator
+{
+  padding-right : 20px;
+}
+
+.reddit-color
+{
+  color : #ff4500;
+}
+
+.twitter-color
+{
+  color : #1da1f2;
+}
+
+.gitter-color
+{
+  color : #e10454;
+}
+
+.github-color
+{
+  color : #000000;
+}
+
+.rss-color
+{
+  color : #ff924a;
+}
+
+.name-of-category
+{
+  font-size        : 85%;
+  border           : solid 1px #ffbcb1;
+  border-radius    : 3px 3px 3px 3px;
+  background-color : #fec1b7;
+  padding-top      : 3px;
+  padding-bottom   : 3px;
+  padding-left     : 5px;
+  padding-right    : 5px;
+  margin-right     : 22px;
+}
+
+.post-info
+{
+  color          : #777777;
+  font-size      : 90%;
+  font-family    : "Roboto Mono", monospace;
+  text-align     : left;
+  padding-top    : 10px;
+  padding-bottom : 60px;
+}
+
+.post-list
+{
+  padding         : 0px 0px 0px 0px;
+  margin          : 0px 0px 0px 0px;
+  list-style-type : none;
+  font-size       : 110%;
+}
+
+
+.post-list li
+{
+  margin-top     : 10px;
+  padding-bottom : 10px;
+}
+
+
+.post-list a
+{
+  text-decoration : none;
+}
+
+
+.post-list a:hover
+{
+  text-decoration : none;
+}
+
+.post-comments
+{
+  padding-left  : 15px;
+  padding-right : 5px;
+  font-size     : 90%;
+  color         : #777777;
+}
+
+.comments-link
+{
+  font-size : 90%;
+  color     : #777777;
+}
+
+.post-date
+{
+  text-align : right;
+  color      : #888888;
+}
+
+.archive-button
+{
+  padding-top : 26px;
+}
+
+.undecorated
+{
+  text-decoration : none;
+  border-bottom   : solid 0px #ffffff;
+}
+
+img[src*='#center']
+{
+  margin    : 0px auto 0px auto;
+  display   : block;
+  max-width : 100%;
+}
+
+.social-buttons-separator
+{
+  padding-top : 40px;
+}
+
+.heart-color
+{
+  color : #ff3a1d;
+}
+
+.tags-cloud
+{
+  text-align     : center;
+  padding-top    : 30px;
+  padding-bottom : 30px;
+  margin         : 0px auto 0px auto;
+  max-width      : 60%;
+}
+
+.tag-default
+{
+  background-color : #fec1b7;
+  border           : solid 1px #ffbcb1;
+  color            : inherit;
+}
+
+
+.sourceCode code
+{
+  font-family : "Roboto Mono", monospace;
+}
+
+pre.sourceCode
+{
+  font-family      : "Roboto Mono", monospace;
+  font-size        : 94%;
+  border           : solid 1px #fbe7d8;
+  border-radius    : 3px 3px 3px 3px;
+  background-color : #fdf6e3;
+  color            : #073642;
+  padding-top      : 10px;
+  padding-bottom   : 10px;
+  padding-left     : 15px;
+  padding-right    : 15px;
+  margin-top       : 20px;
+  margin-bottom    : 20px;
+}
+
+
+#content p > code
+{
+  font-family      : "Roboto Mono", monospace;
+  font-size        : 94%;
+  border-radius    : 3px 3px 3px 3px;
+  border           : solid 1px #fbe7d8;
+  background-color : #fdf6e3;
+  color            : #000000;
+  padding-top      : 1px;
+  padding-bottom   : 1px;
+  padding-left     : 4px;
+  padding-right    : 4px;
+}
+
+
+pre.sourceCode span.kw
+{
+  color       : #007020;
+  font-weight : 600;
+}
+
+
+pre.sourceCode span.dt
+{
+  color : #902000;
+}
+
+
+pre.sourceCode span.dv
+{
+  color : #40a070;
+}
+
+
+pre.sourceCode span.bn
+{
+  color : #40a070;
+}
+
+
+pre.sourceCode span.fl
+{
+  color : #40a070;
+}
+
+
+pre.sourceCode span.ch
+{
+  color : #4070a0;
+}
+
+
+pre.sourceCode span.co
+{
+  color : #60a0b0;
+}
+
+
+pre.sourceCode span.ot
+{
+  color : #007020;
+}
+
+
+pre.sourceCode span.al
+{
+  color       : #fa0202;
+  font-weight : 600;
+}
+
+
+pre.sourceCode span.fu
+{
+  color : #06287e;
+}
+
+
+pre.sourceCode span.er
+{
+  color       : #fa0202;
+  font-weight : 600;
+}
+
+a.sourceLine
+{
+  border-bottom : none;
+}
+
+
+/* Generated with Clay, http://fvisser.nl/clay */
+        </style>
+        <link rel="alternate" type="application/rss+xml" title="RSS" href="http://budevg.github.io/feed.xml">
+    </head>
+    <body>
+        <div class="container-fluid">
+            <div class="navigation">
+                <div class="row">
+                    <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12">
+                        <div class="links">
+                            <a href="../../../../../tags.html" id="tags-link">
+                                Tags
+                            </a>
+                            <span class="links-separator">
+                                
+                            </span>
+                            <a href="../../../../../categories.html" id="categories-link">
+                                Categories
+                            </a>
+                            <span class="links-separator">
+                                
+                            </span>
+                            <a href="../../../../../about.html" id="about-link">
+                                About
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12">
+                        <div class="logo-area">
+                            <a href="../../../../../" title="Home" id="go-home">
+                                <h2>
+                                    Meta-x86
+                                </h2>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12">
+                        <div class="social-links">
+                            <a href="https://twitter.com/budevg" id="sl-2" title="Follow me on twitter">
+                                <i class="fa fa-twitter twitter-color" aria-hidden="true">
+                                    
+                                </i>
+                            </a>
+                            <span class="social-links-separator">
+                                
+                            </span>
+                            <a href="https://github.com/budevg" id="sl-4" title="My Github repositories">
+                                <i class="fa fa-github github-color" aria-hidden="true">
+                                    
+                                </i>
+                            </a>
+                            <span class="social-links-separator">
+                                
+                            </span>
+                            <a href="../../../../../feed.xml" id="sl-5" title="Blog RSS">
+                                <i class="fa fa-rss rss-color" aria-hidden="true">
+                                    
+                                </i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div id="content">
+                <h1>
+    Cross compiling inside docker
+</h1>
+<div class="row">
+    <div class="col-xs-9 col-sm-8 col-md-8 col-lg-8">
+        <div class="post-info">
+            author&nbsp;&nbsp;&nbsp;= "<a href="../../../../../authors/Evgeny%20Budilovsky.html">Evgeny Budilovsky</a>"<br />
+date&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= 2018 Aug 02<br />
+category = "<a href="../../../../../categories/docker.html">docker</a>"<br />
+tags&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= [&quot;<a href="../../../../../tags/docker.html">docker</a>&quot;, &quot;<a href="../../../../../tags/qemu.html">qemu</a>&quot;, &quot;<a href="../../../../../tags/crooss-compilation.html">crooss-compilation</a>&quot;, &quot;<a href="../../../../../tags/virtualization.html">virtualization</a>&quot;]
+
+        </div>
+    </div>
+    <div class="col-xs-3 col-sm-4 col-md-4 col-lg-4">
+        
+
+    </div>
+</div>
+<div>
+    <p>Recently I needed to compile binaries for arm64 cpu. The fastest way to do this is to build cross compilation toolchain and to run x86 gcc that will generate arm64 executables.</p>
+<p>Another way to do this is to use qemu’s user emulation. This feature of qemu allows to run executables that were compiled for different architecture on the x86 host by emulating the architecture and translating the system calls abi between the different architectures.</p>
+<p>We can start by getting docker image with aarch64 centos file system.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="ex">docker</span> pull aarch64/alpine</a></code></pre></div>
+<p>If we try to run our image we will get execution format error</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="ex">docker</span> run -it aarch64/alpine /bin/sh</a>
+<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="ex">standard_init_linux.go</span>:195: exec user process caused <span class="st">&quot;exec format error&quot;</span></a></code></pre></div>
+<p>This is since we are trying to run aarch64 executable on x86 machine. By looking inside the image root file system we can see that the binary is an ARM aarch64 binary.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" data-line-number="1">$ <span class="fu">sudo</span> file <span class="kw">`</span><span class="ex">d</span> inspect aarch64/alpine -f <span class="st">'{{.GraphDriver.Data.RootDir}}'</span><span class="kw">`</span>/bin/busybox</a>
+<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="ex">/docker/overlay/edfece616e612e0aee33cfa5d0efe2b23c563d46ea232b2938d0e9c39a61273c/root/bin</span>/busybox: <span class="ex">ELF</span> 64-bit LSB shared object, ARM aarch64, version 1 (SYSV), <span class="ex">dynamically</span> linked, interpreter /lib/ld-musl-aarch64.so.1, stripped</a></code></pre></div>
+<p>To help us in running these arm64 binaries we can use the qemu’s user emulation. Firs we are going to compile static version of qemu’s user emulation for arm64 architecture.</p>
+<p>We can use the following docker file to build the statically linked qemu inside docker instance. Edit <code>Dockerfile:</code></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="ex">FROM</span> centos:7</a>
+<a class="sourceLine" id="cb4-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="ex">RUN</span> set -x \</a>
+<a class="sourceLine" id="cb4-4" data-line-number="4">    <span class="kw">&amp;&amp;</span> <span class="ex">yum</span> groupinstall -y development \</a>
+<a class="sourceLine" id="cb4-5" data-line-number="5">    <span class="kw">&amp;&amp;</span> <span class="ex">yum</span> install -y yum install wget glibc-static zlib-static pcre-static glib2-static</a>
+<a class="sourceLine" id="cb4-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb4-7" data-line-number="7"><span class="ex">RUN</span> set -x \</a>
+<a class="sourceLine" id="cb4-8" data-line-number="8">    <span class="kw">&amp;&amp;</span> <span class="fu">mkdir</span> /data \</a>
+<a class="sourceLine" id="cb4-9" data-line-number="9">    <span class="kw">&amp;&amp;</span> <span class="bu">cd</span> /data \</a>
+<a class="sourceLine" id="cb4-10" data-line-number="10">    <span class="kw">&amp;&amp;</span> <span class="fu">wget</span> https://github.com/qemu/qemu/archive/v2.12.0.tar.gz \</a>
+<a class="sourceLine" id="cb4-11" data-line-number="11">    <span class="kw">&amp;&amp;</span> <span class="fu">tar</span> xvf *.tar.gz \</a>
+<a class="sourceLine" id="cb4-12" data-line-number="12">    <span class="kw">&amp;&amp;</span> <span class="bu">cd</span> qemu-2.12.0 \</a>
+<a class="sourceLine" id="cb4-13" data-line-number="13">    <span class="kw">&amp;&amp;</span> <span class="ex">./configure</span> --target-list=aarch64-linux-user --enable-linux-user --disable-system --disable-tools --static \</a>
+<a class="sourceLine" id="cb4-14" data-line-number="14">    <span class="kw">&amp;&amp;</span> <span class="fu">make</span> -j4</a></code></pre></div>
+<p>Then we can copy the executable from it using</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="ex">docker</span> build -t build-env .</a>
+<a class="sourceLine" id="cb5-2" data-line-number="2"><span class="ex">docker</span> run --rm --name build-env-instance -dt build-env /bin/bash</a>
+<a class="sourceLine" id="cb5-3" data-line-number="3"><span class="ex">docker</span> cp build-env-instance:/data/qemu-2.12.0/aarch64-linux-user/qemu-aarch64 .</a>
+<a class="sourceLine" id="cb5-4" data-line-number="4"><span class="ex">docker</span> stop build-env-instance</a></code></pre></div>
+<p>Now we have qemu-aarch64 in our current directory. Let’s use it to build docker instance that can run aarch64 executables. Edit <code>Dockerfile.aarch64</code></p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="ex">FROM</span> aarch64/alpine</a>
+<a class="sourceLine" id="cb6-2" data-line-number="2"><span class="ex">ADD</span> qemu-aarch64 /</a></code></pre></div>
+<p>Let’s build it and try to run it.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="ex">docker</span> build -t my-aarch64-env -f Dockerfile.aarch64 .</a>
+<a class="sourceLine" id="cb7-2" data-line-number="2"><span class="ex">docker</span> run --rm -it my-aarch64-env /bin/sh</a></code></pre></div>
+<p>But we are still getting:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="ex">standard_init_linux.go</span>:195: exec user process caused <span class="st">&quot;exec format error&quot;</span></a></code></pre></div>
+<p>The last step is to instruct our kernel to apply the qemu-aarch64 interpreter each time we running arm64 elf file. This can be done using</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="co"># if /proc/sys/fs/binfmt_misc is not mounted</span></a>
+<a class="sourceLine" id="cb9-2" data-line-number="2"><span class="fu">sudo</span> mount binfmt_misc -t binfmt_misc /proc/sys/fs/binfmt_misc</a>
+<a class="sourceLine" id="cb9-3" data-line-number="3"><span class="fu">sudo</span> bash -c <span class="st">&quot;echo ':aarch64:M::\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\xb7\x00:\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff:/qemu-aarch64:' &gt; /proc/sys/fs/binfmt_misc/register&quot;</span></a></code></pre></div>
+<p>And now we can run and compile arm64 code on x86</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="ex">docker</span> run --rm -it my-aarch64-env /bin/sh</a>
+<a class="sourceLine" id="cb10-2" data-line-number="2">$ <span class="fu">uname</span> -m</a>
+<a class="sourceLine" id="cb10-3" data-line-number="3"><span class="ex">aarch64</span></a>
+<a class="sourceLine" id="cb10-4" data-line-number="4">$ <span class="ex">apk</span> update -q</a>
+<a class="sourceLine" id="cb10-5" data-line-number="5">$ <span class="ex">apk</span> add -q file</a>
+<a class="sourceLine" id="cb10-6" data-line-number="6">$ <span class="fu">file</span> /bin/busybox</a>
+<a class="sourceLine" id="cb10-7" data-line-number="7"><span class="ex">/bin</span>/busybox: <span class="ex">ELF</span> 64-bit LSB shared object, ARM aarch64, version 1 (SYSV), <span class="ex">dynamically</span> linked, interpreter /lib/ld-musl-aarch64.so.1, stripped</a>
+<a class="sourceLine" id="cb10-8" data-line-number="8">$ <span class="ex">apk</span> add gcc libc-dev -q</a>
+<a class="sourceLine" id="cb10-9" data-line-number="9">$ <span class="bu">echo</span> <span class="st">'int main() { printf(&quot;hello world\n&quot;); }'</span> <span class="op">&gt;</span> 1.c</a>
+<a class="sourceLine" id="cb10-10" data-line-number="10">$ <span class="fu">gcc</span> 1.c</a>
+<a class="sourceLine" id="cb10-11" data-line-number="11"><span class="ex">1.c</span>: In function <span class="st">'main'</span>:</a>
+<a class="sourceLine" id="cb10-12" data-line-number="12"><span class="ex">1.c</span>:1:14: warning: implicit declaration of function <span class="st">'printf'</span> [-Wimplicit-function-declaration]</a>
+<a class="sourceLine" id="cb10-13" data-line-number="13"> <span class="ex">int</span> main() <span class="kw">{</span> <span class="bu">printf</span>(<span class="st">&quot;hello world\n&quot;</span>); <span class="kw">}</span></a>
+<a class="sourceLine" id="cb10-14" data-line-number="14">              ^<span class="ex">~~~~~</span></a>
+<a class="sourceLine" id="cb10-15" data-line-number="15"><span class="ex">1.c</span>:1:14: warning: incompatible implicit declaration of built-in function <span class="st">'printf'</span></a>
+<a class="sourceLine" id="cb10-16" data-line-number="16"><span class="ex">1.c</span>:1:14: note: include <span class="st">'&lt;stdio.h&gt;'</span> or provide a declaration of <span class="st">'printf'</span></a>
+<a class="sourceLine" id="cb10-17" data-line-number="17">$ <span class="ex">./a.out</span></a>
+<a class="sourceLine" id="cb10-18" data-line-number="18"><span class="ex">hello</span> world</a>
+<a class="sourceLine" id="cb10-19" data-line-number="19">$ <span class="fu">file</span> a.out</a>
+<a class="sourceLine" id="cb10-20" data-line-number="20"><span class="ex">a.out</span>: ELF 64-bit LSB shared object, ARM aarch64, version 1 (SYSV), <span class="ex">dynamically</span> linked, interpreter /lib/ld-musl-aarch64.so.1, not stripped</a>
+<a class="sourceLine" id="cb10-21" data-line-number="21">$</a></code></pre></div>
+<p>If we run ps on our host we can see that the /bin/sh in the container is actually executed using the qemu-aarch64 interpreter</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb11-1" data-line-number="1">$ <span class="fu">ps</span> -ef <span class="kw">|</span><span class="fu">grep</span> qemu <span class="kw">|</span><span class="fu">grep</span> -v grep</a>
+<a class="sourceLine" id="cb11-2" data-line-number="2"><span class="ex">root</span>     16389 16362  0 12:14 pts/0    00:00:00 /qemu-aarch64 /bin/sh</a></code></pre></div>
+</div>
+
+            </div>
+        </div>
+        <footer class="footer">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 left">
+                        
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 center">
+                        
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 right">
+                        
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </body>
+</html>
