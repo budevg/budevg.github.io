@@ -1,0 +1,511 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"
+    xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <channel>
+        <title>Evgeny Budilovsky - All posts</title>
+        <link>http://budevg.github.io</link>
+        <description><![CDATA[Personal blog of Evgeny Budilovsky]]></description>
+        <atom:link href="http://budevg.github.io/rss.xml" rel="self"
+                   type="application/rss+xml" />
+        <lastBuildDate>Wed, 25 Sep 2019 00:00:00 UT</lastBuildDate>
+        <item>
+    <title>Debugging Makefile</title>
+    <link>http://budevg.github.io/posts/2019-09-25-make-debug.html</link>
+    <description><![CDATA[<p>Makefiles can become pretty complicated and you can spend many hours trying to understand what’s going on in the build systems. Let’s create a basic make file.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode makefile"><code class="sourceCode makefile"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="dt">OBJS </span><span class="ch">:=</span><span class="st"> a.o b.o c.o</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="dt">TARGET </span><span class="ch">:=</span><span class="st"> app</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="dv">%.o:</span><span class="dt"> %.c</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>	gcc -o <span class="ch">$@</span> <span class="ch">$&lt;</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a><span class="dv">$(TARGET):</span><span class="dt"> </span><span class="ch">$(</span><span class="dt">OBJS</span><span class="ch">)</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>	ld -o <span class="ch">$@</span> <span class="ch">$^</span></span></code></pre></div>
+<p>let’s say we are not sure what’s inside the <code>OBJS</code> variable. We can add the following target to the makefile</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode makefile"><code class="sourceCode makefile"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="dv">print-%:</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>	<span class="ch">@</span><span class="fu">echo </span><span class="st">&#39;</span><span class="ch">$*</span><span class="st">=</span><span class="ch">$($*)</span><span class="st">&#39;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>	<span class="ch">@</span><span class="fu">echo </span><span class="st">&#39;  origin = </span><span class="ch">$(</span><span class="kw">origin</span><span class="st"> </span><span class="ch">$*)</span><span class="st">&#39;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>	<span class="ch">@</span><span class="fu">echo </span><span class="st">&#39;  flavor = </span><span class="ch">$(</span><span class="kw">flavor</span><span class="st"> </span><span class="ch">$*)</span><span class="st">&#39;</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>	<span class="ch">@</span><span class="fu">echo </span><span class="st">&#39;   value = </span><span class="ch">$(</span><span class="kw">value</span><span class="st">  </span><span class="ch">$*)</span><span class="st">&#39;</span></span></code></pre></div>
+<p>and run</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>$ <span class="fu">make</span> print-OBJS</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="va">OBJS=</span>a.o <span class="ex">b.o</span> c.o</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>  <span class="ex">origin</span> = file</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a>  <span class="ex">flavor</span> = simple</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>  <span class="ex">value</span> = a.o b.o c.o</span></code></pre></div>
+<p>to get value of the variable.</p>]]></description>
+    <pubDate>Wed, 25 Sep 2019 00:00:00 UT</pubDate>
+    <guid>http://budevg.github.io/posts/2019-09-25-make-debug.html</guid>
+    <dc:creator>Evgeny Budilovsky</dc:creator>
+</item>
+<item>
+    <title>Let&#39;s talk about development environment</title>
+    <link>http://budevg.github.io/posts/2019-05-08-dev-environment.html</link>
+    <description><![CDATA[<p>If you are a developer, then you probably value the software stack that you use for your daily tasks. I am not talking about specific programming language that you use to develop the next gen product X in your shiny startup Y. I am talking about more basic software. The operating system, the desktop GUI environment, the code editor and a set of productivity tools that you select to make your life easier.</p>
+<p>For me the journey to build my software stack was full of tries and errors and I am still in the middle of it waiting for new adventures.</p>
+<p>The first big discovery for me was focusing on <code>Emacs</code> as the one and only editor for me. I was familiar with <code>Emacs</code> from my lisp studies in university but then I was using it in vanilla form without any customizations. One day I observed a power user working in <code>XEmacs</code> (at that time <code>XEmacs</code> project was superior to the gnu <code>Emacs</code> project). It was amazing. Working in complete state of “flow” without constantly switching windows, clicking buttons or even moving the mouse. It was fast and powerful and it had everything inside (terminal, file manager, man pages). I started using <code>XEmacs</code> first with the power configuration I borrowed from that guy and later I built my own configuration which I maintain and update to this date. Since then the gnu <code>Emacs</code> project came back to life and I switched to gnu <code>Emacs</code> which was now delivering new releases in much faster iterations.</p>
+<p>Switching to <code>Emacs</code> gave me great power and full control of my coding workflow. I was able to overcome any obstacles by programming <code>Emacs</code> in lisp or by searching for extensions online. Still my desktop environment was not perfect.</p>
+<p>When I started programming I was using windows desktop. Since most of my work was on a linux environment, I was running X server from cygwin on my windows desktop and then connecting to the linux through ssh and X forwarding <code>Emacs</code> to my windows desktop. Later I completely switched to linux and started running ubuntu distribution as my main desktop client both at home and at work.</p>
+<p>I started to maintain repository of notes with recipes of how to install ubuntu system from scratch with all the software I use and all the desktop customization I want. Installing system from scratch required to walk step by step through my notes and configuring keyboard shortcuts, fonts, display settings, installing all the programs I use and then configuring them. At the same time ubuntu was growing and publishing new releases. The default desktop changed to unity but I didn’t like the new design. The GUI felt heavy and not responsive on my home pc (which was not the latest and greatest hardware). At first I switched to gnome classic but in later releases this option was removed and I decided to try xubuntu which was the same ubuntu distribution but with the light xfce desktop environment.</p>
+<p>Working on xubuntu was ok. It was light and fast and I customized it exactly as I wanted. At the same time I started to learn about functional programming and taking a special interest in Haskell programming language. As I became more fluent in writing code in Haskell, I started to explore the Haskell applications ecosystem. I stumbled upon <code>Xmonad</code>, which is a tilling windows manager which is very customizable and can be programmed in Haskell. It reminded me <code>Emacs</code> which is also very customizable and can be programmed in Lisp. The concept of tiling windows manager was new for me but I have always hated the constant need to adjust and switch between floating windows.</p>
+<p>I installed <code>Xmonad</code> and configured it as new xsession on the xubuntu system. I worked with existing <code>Xmonad</code> configurations that I’ve found on github and modified them to match my own preferences. The result was fast and customizable desktop experience. With shortcuts and modifications matching my work flow. Each time I wanted to change something all I needed to do was to update my <code>Xmonad</code> configuration with several lines of Haskell code.</p>
+<p>Installing new software on my dekstop was always big issue for me. I wanted to avoid “polluting” my distribution, but at the same time I wanted to try new software. The solution was to use virtual machines through kvm or containers through docker. One day I read about new way to manage software packages through software called <code>Nix</code> which was very popular among haskell developers. The idea of <code>Nix</code> is to replace the global installation locations (/lib, /bin, etc.), with per package unique locations. These locations include unique hash which computed based on the package dependencies and it’s contents. The bottom line is that you can easily install new versions of software (even versions that rely on different versions of the same library - no dll hell). Additionally it allows you to easily revert back if the new package doesn’t work or even try the new package inside isolated environment (nix-shell).</p>
+<p>There are two ways to work with <code>Nix</code>. At first I used it as additional package manager together with the default apt/dpkg to handle ubuntu packages. But <code>Nix</code> has it’s own linux distribution called <code>Nixos</code>. It uses <code>Nix</code> package manager to configure the software and boot linux kernel. Everything can be configured in descriptive way using the <code>Nix</code> expression language and all the advantages of <code>Nix</code> package manager can be applied to the whole system. For example you can switch to new kernel by changing configuration line and if the system doesn’t work as expected you can easily revert to old version. Switching to <code>Nixos</code> solved for me two problems. The first was the problem of installing all my software including os from scratch in deterministic way. Now I have configuration of all my software and after bootstrapping <code>Nixos</code> I can just apply my configuration and I am getting all my software configured and ready. The second problem was of installing new software without “polluting” the distribution. Since <code>Nix</code> doesn’t have global state and each package can coexist with each other package, trying new things is easy and after I am done I can invoke nix-collect-garbage to get rid of leftovers.</p>
+<p>So today my development environment is based on <code>Emacs</code>, <code>Xmonad</code> and <code>Nixos</code>. Configuration of each component is maintained in separate github repository</p>
+<ul>
+<li><a href="https://github.com/budevg/emacs-conf">emacs-conf</a></li>
+<li><a href="https://github.com/budevg/xmonad-conf">xmonad-conf</a></li>
+<li><a href="https://github.com/budevg/nix-conf">nix-conf</a></li>
+</ul>
+<p><img src="/static/files/posts/2019_05_09/emacs-xmonad-nix.png" style="width:90.0%;height:90.0%" /></p>]]></description>
+    <pubDate>Wed, 08 May 2019 00:00:00 UT</pubDate>
+    <guid>http://budevg.github.io/posts/2019-05-08-dev-environment.html</guid>
+    <dc:creator>Evgeny Budilovsky</dc:creator>
+</item>
+<item>
+    <title>Cross compiling inside docker</title>
+    <link>http://budevg.github.io/posts/2018-08-02-docker-cross-compile.html</link>
+    <description><![CDATA[<p>Recently I needed to compile binaries for arm64 cpu. The fastest way to do this is to build cross compilation toolchain and to run x86 gcc that will generate arm64 executables.</p>
+<p>Another way to do this is to use qemu’s user emulation. This feature of qemu allows to run executables that were compiled for different architecture on the x86 host by emulating the architecture and translating the system calls abi between the different architectures.</p>
+<p>We can start by getting docker image with aarch64 centos file system.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="ex">docker</span> pull aarch64/alpine</span></code></pre></div>
+<p>If we try to run our image we will get execution format error</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="ex">docker</span> run -it aarch64/alpine /bin/sh</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="ex">standard_init_linux.go</span>:195: exec user process caused <span class="st">&quot;exec format error&quot;</span></span></code></pre></div>
+<p>This is since we are trying to run aarch64 executable on x86 machine. By looking inside the image root file system we can see that the binary is an ARM aarch64 binary.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>$ <span class="fu">sudo</span> file <span class="kw">`</span><span class="ex">d</span> inspect aarch64/alpine -f <span class="st">&#39;{{.GraphDriver.Data.RootDir}}&#39;</span><span class="kw">`</span>/bin/busybox</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="ex">/docker/overlay/edfece616e612e0aee33cfa5d0efe2b23c563d46ea232b2938d0e9c39a61273c/root/bin</span>/busybox: <span class="ex">ELF</span> 64-bit LSB shared object, ARM aarch64, version 1 (SYSV), <span class="ex">dynamically</span> linked, interpreter /lib/ld-musl-aarch64.so.1, stripped</span></code></pre></div>
+<p>To help us in running these arm64 binaries we can use the qemu’s user emulation. Firs we are going to compile static version of qemu’s user emulation for arm64 architecture.</p>
+<p>We can use the following docker file to build the statically linked qemu inside docker instance. Edit <code>Dockerfile:</code></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="ex">FROM</span> centos:7</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="ex">RUN</span> set -x <span class="kw">\</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a>    <span class="kw">&amp;&amp;</span> <span class="ex">yum</span> groupinstall -y development <span class="kw">\</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a>    <span class="kw">&amp;&amp;</span> <span class="ex">yum</span> install -y yum install wget glibc-static zlib-static pcre-static glib2-static</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a><span class="ex">RUN</span> set -x <span class="kw">\</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a>    <span class="kw">&amp;&amp;</span> <span class="fu">mkdir</span> /data <span class="kw">\</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a>    <span class="kw">&amp;&amp;</span> <span class="bu">cd</span> /data <span class="kw">\</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a>    <span class="kw">&amp;&amp;</span> <span class="fu">wget</span> https://github.com/qemu/qemu/archive/v2.12.0.tar.gz <span class="kw">\</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true"></a>    <span class="kw">&amp;&amp;</span> <span class="fu">tar</span> xvf *.tar.gz <span class="kw">\</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true"></a>    <span class="kw">&amp;&amp;</span> <span class="bu">cd</span> qemu-2.12.0 <span class="kw">\</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true"></a>    <span class="kw">&amp;&amp;</span> <span class="ex">./configure</span> --target-list=aarch64-linux-user --enable-linux-user --disable-system --disable-tools --static <span class="kw">\</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true"></a>    <span class="kw">&amp;&amp;</span> <span class="fu">make</span> -j4</span></code></pre></div>
+<p>Then we can copy the executable from it using</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="ex">docker</span> build -t build-env .</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="ex">docker</span> run --rm --name build-env-instance -dt build-env /bin/bash</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a><span class="ex">docker</span> cp build-env-instance:/data/qemu-2.12.0/aarch64-linux-user/qemu-aarch64 .</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a><span class="ex">docker</span> stop build-env-instance</span></code></pre></div>
+<p>Now we have qemu-aarch64 in our current directory. Let’s use it to build docker instance that can run aarch64 executables. Edit <code>Dockerfile.aarch64</code></p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="ex">FROM</span> aarch64/alpine</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a><span class="ex">ADD</span> qemu-aarch64 /</span></code></pre></div>
+<p>Let’s build it and try to run it.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="ex">docker</span> build -t my-aarch64-env -f Dockerfile.aarch64 .</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a><span class="ex">docker</span> run --rm -it my-aarch64-env /bin/sh</span></code></pre></div>
+<p>But we are still getting:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="ex">standard_init_linux.go</span>:195: exec user process caused <span class="st">&quot;exec format error&quot;</span></span></code></pre></div>
+<p>The last step is to instruct our kernel to apply the qemu-aarch64 interpreter each time we running arm64 elf file. This can be done using</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="co"># if /proc/sys/fs/binfmt_misc is not mounted</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a><span class="fu">sudo</span> mount binfmt_misc -t binfmt_misc /proc/sys/fs/binfmt_misc</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a><span class="fu">sudo</span> bash -c <span class="st">&quot;echo &#39;:aarch64:M::\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\xb7\x00:\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff:/qemu-aarch64:&#39; &gt; /proc/sys/fs/binfmt_misc/register&quot;</span></span></code></pre></div>
+<p>And now we can run and compile arm64 code on x86</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a><span class="ex">docker</span> run --rm -it my-aarch64-env /bin/sh</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a>$ <span class="fu">uname</span> -m</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a><span class="ex">aarch64</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true"></a>$ <span class="ex">apk</span> update -q</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true"></a>$ <span class="ex">apk</span> add -q file</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true"></a>$ <span class="fu">file</span> /bin/busybox</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true"></a><span class="ex">/bin</span>/busybox: <span class="ex">ELF</span> 64-bit LSB shared object, ARM aarch64, version 1 (SYSV), <span class="ex">dynamically</span> linked, interpreter /lib/ld-musl-aarch64.so.1, stripped</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true"></a>$ <span class="ex">apk</span> add gcc libc-dev -q</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true"></a>$ <span class="bu">echo</span> <span class="st">&#39;int main() { printf(&quot;hello world\n&quot;); }&#39;</span> <span class="op">&gt;</span> 1.c</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true"></a>$ <span class="fu">gcc</span> 1.c</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true"></a><span class="ex">1.c</span>: In function <span class="st">&#39;main&#39;</span>:</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true"></a><span class="ex">1.c</span>:1:14: warning: implicit declaration of function <span class="st">&#39;printf&#39;</span> [-Wimplicit-function-declaration]</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true"></a> <span class="ex">int</span> main() <span class="kw">{</span> <span class="bu">printf</span>(<span class="st">&quot;hello world\n&quot;</span>); <span class="kw">}</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true"></a>              ^<span class="ex">~~~~~</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true"></a><span class="ex">1.c</span>:1:14: warning: incompatible implicit declaration of built-in function <span class="st">&#39;printf&#39;</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true"></a><span class="ex">1.c</span>:1:14: note: include <span class="st">&#39;&lt;stdio.h&gt;&#39;</span> or provide a declaration of <span class="st">&#39;printf&#39;</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true"></a>$ <span class="ex">./a.out</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true"></a><span class="ex">hello</span> world</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true"></a>$ <span class="fu">file</span> a.out</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true"></a><span class="ex">a.out</span>: ELF 64-bit LSB shared object, ARM aarch64, version 1 (SYSV), <span class="ex">dynamically</span> linked, interpreter /lib/ld-musl-aarch64.so.1, not stripped</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true"></a>$</span></code></pre></div>
+<p>If we run ps on our host we can see that the /bin/sh in the container is actually executed using the qemu-aarch64 interpreter</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a>$ <span class="fu">ps</span> -ef <span class="kw">|</span><span class="fu">grep</span> qemu <span class="kw">|</span><span class="fu">grep</span> -v grep</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true"></a><span class="ex">root</span>     16389 16362  0 12:14 pts/0    00:00:00 /qemu-aarch64 /bin/sh</span></code></pre></div>]]></description>
+    <pubDate>Thu, 02 Aug 2018 00:00:00 UT</pubDate>
+    <guid>http://budevg.github.io/posts/2018-08-02-docker-cross-compile.html</guid>
+    <dc:creator>Evgeny Budilovsky</dc:creator>
+</item>
+<item>
+    <title>Scratch space using tmpfs and friends</title>
+    <link>http://budevg.github.io/posts/2018-07-20-scratch-space.html</link>
+    <description><![CDATA[<p>When programming I tend to generate many files that I don’t want to save persistently on my storage media. Pdf documents I download, github repositories I clone to check something in source code and many other types of files should be stored somewhere but I would be glad to get rid of them when I power off my laptop.</p>
+<p>For this purpose I use the following script which creates tmpfs memory backed file system which is mounted at <code>~/scratch</code>. I use this directory to store all temporary files and I know they will disappear after I reboot.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="co">#!/bin/sh</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="fu">sudo</span> mount -t tmpfs -o size=8G none ~/scratch/</span></code></pre></div>
+<p>Another use case is when I want to temporarily install some packages to try new stuff. For example if I want to compile some <code>haskell</code> application using <code>stack</code>. Stack is going to pull and compile many new packages and it will store them at <code>~/.stack</code>. If I don’t want to persistently store all these packages on my storage media, I can do the following trick. Create <code>~/scratch/stack-shadow</code> directory. Use overlayfs to create new file system that mirrors the old directory and stores all modified or newly created files in new directory. Using <code>mount -o bind</code> to bind the overlayfs directory to the <code>~/.stack</code> location</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="fu">mkdir</span> -p ~/scratch/stack-shadow/upperdir <span class="kw">\</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>         <span class="ex">~/scratch/stack-shadow/workdir</span>  <span class="kw">\</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>         <span class="ex">~/scratch/stack-shadow/export</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a><span class="fu">sudo</span> mount -t overlay overlay <span class="kw">\</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>           <span class="ex">-olowerdir</span>=~/.stack <span class="kw">\</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>           <span class="ex">-oupperdir</span>=~/scratch/stack-shadow/upperdir <span class="kw">\</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a>           <span class="ex">-oworkdir</span>=~/scratch/stack-shadow/workdir  <span class="kw">\</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a>           <span class="ex">~/scratch/stack-shadow/export</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a><span class="fu">sudo</span> mount -o bind ~/scratch/stack-shadow/export ~/.stack</span></code></pre></div>
+<p>We can build a bash script to automate these commands.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="co">#!/bin/bash</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="kw">function</span><span class="fu"> usage</span> <span class="kw">{</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a>    <span class="bu">echo</span> <span class="st">&quot;usage: </span><span class="va">$0</span><span class="st"> &lt;command&gt; &lt;src&gt; &lt;dst&gt;&quot;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>    <span class="bu">echo</span> <span class="st">&quot;commands:&quot;</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a>    <span class="bu">echo</span> -e <span class="st">&quot;\tnew - bind dst to location at src&quot;</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a>    <span class="bu">echo</span> -e <span class="st">&quot;\tshadow  - overlay src to dst, bind dst to src&quot;</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a>    <span class="bu">echo</span> -e <span class="st">&quot;\tdup - overlay src to dst&quot;</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a>    <span class="bu">echo</span> -e <span class="st">&quot;\tclear - umount src and dst&quot;</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a>    <span class="bu">exit</span> 1</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a><span class="kw">}</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true"></a><span class="kw">function</span><span class="fu"> new</span> <span class="kw">{</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true"></a>    <span class="bu">local</span> <span class="va">src=$1</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true"></a>    <span class="bu">local</span> <span class="va">dst=$2</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true"></a>    <span class="fu">mkdir</span> -p <span class="va">$dst</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true"></a>    <span class="fu">sudo</span> mount -o bind <span class="va">$dst</span> <span class="va">$src</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true"></a><span class="kw">}</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true"></a></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true"></a><span class="kw">function</span><span class="fu"> shadow</span> <span class="kw">{</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true"></a>    <span class="bu">local</span> <span class="va">src=$1</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true"></a>    <span class="bu">local</span> <span class="va">dst=$2</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true"></a>    <span class="ex">dup</span> <span class="va">$src</span> <span class="va">$dst</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true"></a>    <span class="fu">sudo</span> mount -o bind <span class="va">$dst</span>/export <span class="va">$src</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true"></a><span class="kw">}</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true"></a></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true"></a><span class="kw">function</span><span class="fu"> dup</span> <span class="kw">{</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true"></a>    <span class="bu">local</span> <span class="va">src=$1</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true"></a>    <span class="bu">local</span> <span class="va">dst=$2</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true"></a>    <span class="fu">mkdir</span> -p <span class="va">$dst</span>/upperdir <span class="va">$dst</span>/workdir <span class="va">$dst</span>/export</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true"></a>    <span class="fu">sudo</span> mount -t overlay overlay -olowerdir=<span class="va">$src</span> -oupperdir=<span class="va">$dst</span>/upperdir -oworkdir=<span class="va">$dst</span>/workdir <span class="va">$dst</span>/export</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true"></a><span class="kw">}</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true"></a></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true"></a><span class="kw">function</span><span class="fu"> clear</span> <span class="kw">{</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true"></a>    <span class="bu">local</span> <span class="va">src=$1</span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true"></a>    <span class="bu">local</span> <span class="va">dst=$2</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true"></a>    <span class="bu">test</span> -d <span class="va">$src</span> <span class="kw">&amp;&amp;</span> <span class="fu">sudo</span> umount <span class="va">$src</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true"></a>    <span class="bu">test</span> -d <span class="va">$dst</span>/export <span class="kw">&amp;&amp;</span> <span class="fu">sudo</span> umount <span class="va">$dst</span>/export</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true"></a><span class="kw">}</span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true"></a></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true"></a><span class="kw">if</span><span class="bu"> [</span> <span class="va">$#</span> <span class="ot">-lt</span> 3<span class="bu"> ]</span>; <span class="kw">then</span> <span class="ex">usage</span><span class="kw">;</span> <span class="kw">fi</span></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true"></a></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true"></a><span class="kw">set</span> <span class="ex">-x</span></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true"></a></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true"></a><span class="kw">case</span> <span class="st">&quot;</span><span class="va">$1</span><span class="st">&quot;</span><span class="kw"> in</span></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true"></a>    new<span class="kw">)</span></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true"></a>        <span class="ex">new</span> <span class="va">$2</span> <span class="va">$3</span></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true"></a>        <span class="kw">;;</span></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true"></a>    shadow<span class="kw">)</span></span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true"></a>        <span class="ex">shadow</span> <span class="va">$2</span> <span class="va">$3</span></span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true"></a>        <span class="kw">;;</span></span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true"></a>    dup<span class="kw">)</span></span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true"></a>        <span class="ex">dup</span> <span class="va">$2</span> <span class="va">$3</span></span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true"></a>        <span class="kw">;;</span></span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true"></a>    clear<span class="kw">)</span></span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true"></a>        <span class="fu">clear</span> <span class="va">$2</span> <span class="va">$3</span></span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true"></a>        <span class="kw">;;</span></span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true"></a>    *<span class="kw">)</span></span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true"></a>        <span class="ex">usage</span></span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true"></a><span class="kw">esac</span></span></code></pre></div>]]></description>
+    <pubDate>Fri, 20 Jul 2018 00:00:00 UT</pubDate>
+    <guid>http://budevg.github.io/posts/2018-07-20-scratch-space.html</guid>
+    <dc:creator>Evgeny Budilovsky</dc:creator>
+</item>
+<item>
+    <title>Virtualization life cycle in Amazon</title>
+    <link>http://budevg.github.io/posts/2017-12-01-virt-lifecycle.html</link>
+    <description><![CDATA[<p>During excellent presentation at <a href="https://reinvent.awsevents.com/">AWS re:invent</a>, Anthony Liguori who was <a href="https://www.qemu.org/">QEMU’s</a> maintainer in the past, is telling us the story of virtualization infrastructure at Amazon. Ironically this is a story of hardware problem which starts with software solution and gradually replaced with hardware to make solution more efficient.</p>
+<center>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/LabltEXk0VQ" frameborder="0" allowfullscreen>
+</iframe>
+</center>]]></description>
+    <pubDate>Fri, 01 Dec 2017 00:00:00 UT</pubDate>
+    <guid>http://budevg.github.io/posts/2017-12-01-virt-lifecycle.html</guid>
+    <dc:creator>Evgeny Budilovsky</dc:creator>
+</item>
+<item>
+    <title>RDMA 101 - Buiding virtual setup</title>
+    <link>http://budevg.github.io/posts/2017-04-29-rdma-101-1.html</link>
+    <description><![CDATA[<p>We are going to explore RDMA and it’s applications in a series of tutorials starting with this one.</p>
+<p>The first step is to build virtual environment where we can run our applications. Usually RDMA communication requires special RDMA capable NIC on your server. Many vendors, such as <a href="https://www.mellanox.com/">Mellanox</a>, sell this hardware but for our development effort we are going to build a virtual environment based on <a href="http://www.qemu-project.org/">qemu</a> and <a href="https://github.com/zrlio/softiwarp">softiwarp</a> software.</p>
+<h1 id="virtual-environment">Virtual environment</h1>
+<h2 id="base-image">Base image</h2>
+<p>We start with ubuntu 16.04.2 qemu image. It has linux kernel 4.8 installed and a basic development tools</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a>$ <span class="fu">sudo</span> apt-get install linux-generic-hwe-16.04 build-essential <span class="kw">\</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>                       <span class="fu">automake</span> autoconf libtool</span></code></pre></div>
+<p>Let’s call this image <code>ubuntu-16.04.2-dev</code>. We are going to create another image based on this image with all the rdma stack installed on it called <code>ubuntu-rdma.qcow2</code></p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>$ <span class="ex">qemu-img</span> create -f qcow2 -b ubuntu-16.04.2-dev ubuntu-rdma.qcow2</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="ex">Formatting</span> <span class="st">&#39;ubuntu-rdma.qcow2&#39;</span> ...</span></code></pre></div>
+<p>Let’s start a guest and install RDMA stack inside of it.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="ex">kvm</span> -m 1G <span class="kw">\</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="ex">-netdev</span> user,hostfwd=tcp::5555-:22,id=net0 <span class="kw">\</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="ex">-device</span> virtio-net-pci,netdev=net0 <span class="kw">\</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a><span class="ex">-drive</span> if=virtio,file=ubuntu-rdma.qcow2,cache=unsafe</span></code></pre></div>
+<p>We can ssh to guest through local port 5555 which is redirected to port 22 on guest.</p>
+<h2 id="install-rdma-libraries-and-tools">Install RDMA libraries and tools</h2>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>$ <span class="fu">sudo</span> apt-get install libibverbs-dev librdmacm-dev <span class="kw">\</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>                       <span class="ex">rdmacm-utils</span> perftest ibverbs-utils</span></code></pre></div>
+<h2 id="install-softiwarp">Install SoftiWARP</h2>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a>$ <span class="fu">git</span> clone https://github.com/zrlio/softiwarp.git</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="ex">...</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a>$ <span class="bu">pushd</span> softiwarp/kernel</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a>$ <span class="fu">make</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a>$ <span class="fu">sudo</span> mkdir -p /lib/modules/<span class="kw">`</span><span class="fu">uname</span> -r<span class="kw">`</span>/kernel/extra</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a>$ <span class="fu">sudo</span> cp siw.ko /lib/modules/<span class="kw">`</span><span class="fu">uname</span> -r<span class="kw">`</span>/kernel/extra</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a>$ <span class="fu">sudo</span> depmod -a</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true"></a>$ <span class="bu">popd</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true"></a>$ <span class="bu">pushd</span> softiwarp/userlib</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true"></a>$ <span class="ex">./autogen.sh</span> <span class="kw">&amp;&amp;</span> <span class="ex">./configure</span> --prefix= <span class="kw">&amp;&amp;</span> <span class="fu">make</span> <span class="kw">&amp;&amp;</span> <span class="fu">sudo</span> make install</span></code></pre></div>
+<h2 id="shutdown">Shutdown</h2>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="fu">sudo</span> shutdown -h now</span></code></pre></div>
+<h2 id="create-two-guests">Create two guests</h2>
+<p>Based on the <code>ubuntu-rdma.qcow2</code> image we just created let’s build two images <code>vm1.qcow2</code> and <code>vm2.qcow2</code></p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a>$ <span class="kw">for</span> <span class="ex">i</span> in <span class="dt">{1..2}</span><span class="kw">;</span> <span class="kw">do</span> <span class="ex">qemu-img</span> create -f qcow2 -b ubuntu-rdma.qcow2 vm<span class="va">${i}</span>.qcow2<span class="kw">;</span> <span class="kw">done</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a>$ <span class="fu">ls</span> vm*</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a><span class="ex">vm1.qcow2</span>  vm2.qcow2</span></code></pre></div>
+<p>Now we are going to run both guest. Each of them will have two network interfaces. The first interface is configured to allow access from the guest to the internet and to allow access from the host to the guest’s ssh service by connecting to local port 5551 (or 5552 for second vm). The second network interface will be used for rdma access we are going to use qemu’s feature to create network using UDP multicast socket.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="kw">for</span> <span class="ex">i</span> in <span class="dt">{1..2}</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a><span class="kw">do</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a>  <span class="ex">kvm</span> -name vm<span class="va">${i}</span> -m 1G <span class="kw">\</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true"></a>      <span class="ex">-netdev</span> user,hostfwd=tcp::555<span class="va">${i}</span>-:22,id=net0 <span class="kw">\</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true"></a>      <span class="ex">-device</span> virtio-net-pci,netdev=net0 <span class="kw">\</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true"></a>      <span class="ex">-netdev</span> socket,mcast=230.0.0.1:1234,id=net1 <span class="kw">\</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true"></a>      <span class="ex">-device</span> virtio-net-pci,mac=52:54:00:12:34:0<span class="va">${i}</span>,netdev=net1 <span class="kw">\</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true"></a>      <span class="ex">-drive</span> if=virtio,file=vm<span class="va">${i}</span>.qcow2,cache=unsafe <span class="kw">&amp;</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true"></a><span class="kw">done</span></span></code></pre></div>
+<p>Now login to each of the machines and set hostname and ip for the rdma nic:</p>
+<ul>
+<li>vm1</li>
+</ul>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="fu">ssh</span> -p 5551 localhost</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a><span class="ex">vm1</span> $ sudo bash -c <span class="st">&#39;echo 127.0.0.1 vm1 &gt;&gt; /etc/hosts&#39;</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a><span class="ex">vm1</span> $ sudo hostnamectl set-hostname vm1</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true"></a><span class="ex">vm1</span> $ sudo su</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true"></a><span class="ex">vm1</span> $ cat <span class="op">&lt;&lt; EOF</span> <span class="op">&gt;&gt;</span> <span class="ex">/etc/network/interfaces</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true"></a>auto ens4</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true"></a>iface ens4 inet <span class="op">s</span><span class="ex">tatic</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true"></a>  address 10.0.0.1</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true"></a>  netmask 255.255.255.0</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true"></a>EOF</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true"></a>vm1 $ ifup ens4</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true"></a>vm1 $ exit</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true"></a>vm1 $ exit</span></code></pre></div>
+<ul>
+<li>vm2</li>
+</ul>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a><span class="fu">ssh</span> -p 5552 localhost</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a><span class="ex">vm2</span> $ sudo bash -c <span class="st">&#39;echo 127.0.0.1 vm2 &gt;&gt; /etc/hosts&#39;</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a><span class="ex">vm2</span> $ sudo hostnamectl set-hostname vm2</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true"></a><span class="ex">vm2</span> $ sudo su</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true"></a><span class="ex">vm2</span> $ cat <span class="op">&lt;&lt; EOF</span> <span class="op">&gt;&gt;</span> <span class="ex">/etc/network/interfaces</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true"></a>auto ens4</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true"></a>iface ens4 inet <span class="op">s</span><span class="ex">tatic</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true"></a>  address 10.0.0.2</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true"></a>  netmask 255.255.255.0</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true"></a>EOF</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true"></a>vm2 $ ifup ens4</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true"></a>vm2 $ exit</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true"></a>vm2 $ exit</span></code></pre></div>
+<p>Make sure that your host firewall is not blocking the udp broadcast over port 1234</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a>$ <span class="fu">sudo</span> iptables -A INPUT -p udp --dport 1234 -j ACCEPT</span></code></pre></div>
+<h2 id="check-tcp-connectivity">Check tcp connectivity</h2>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true"></a><span class="ex">vm1</span> $ ping 10.0.0.2</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true"></a><span class="ex">PING</span> 10.0.0.2 (10.0.0.2) <span class="ex">56</span>(84) <span class="ex">bytes</span> of data.</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true"></a><span class="ex">64</span> bytes from 10.0.0.2: icmp_seq=1 ttl=64 time=0.671 ms</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true"></a><span class="ex">64</span> bytes from 10.0.0.2: icmp_seq=2 ttl=64 time=0.776 ms</span></code></pre></div>
+<h2 id="check-rdma-connectivity">Check RDMA connectivity</h2>
+<ul>
+<li>vm1</li>
+</ul>
+<div class="sourceCode" id="cb13"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true"></a><span class="ex">vm1</span> $ sudo modprobe -a siw rdma_ucm</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true"></a><span class="ex">vm1</span> $ rping -s -a 10.0.0.1 -v</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true"></a><span class="ex">server</span> ping data: rdma-ping-0: ABCDEFGHIJKLMNOPQRSTUVWXYZ[<span class="dt">\]</span>^_<span class="kw">`</span><span class="ex">abcdefghijklmnopqr</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true"></a><span class="ex">server</span> ping data: rdma-ping-1: BCDEFGHIJKLMNOPQRSTUVWXYZ[<span class="dt">\]</span>^_<span class="kw">`</span>abcdefghijklmnopqrs</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true"></a><span class="ex">server</span> DISCONNECT EVENT...</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true"></a><span class="bu">wait</span> for RDMA_READ_ADV state 10</span></code></pre></div>
+<ul>
+<li>vm2</li>
+</ul>
+<div class="sourceCode" id="cb14"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true"></a><span class="ex">vm2</span> $ sudo modprobe -a siw rdma_ucm</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true"></a><span class="ex">vm2</span> $ rping -c -a 10.0.0.1 -C 2 -v</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true"></a><span class="fu">ping</span> data: rdma-ping-0: ABCDEFGHIJKLMNOPQRSTUVWXYZ[<span class="dt">\]</span>^_<span class="kw">`</span><span class="ex">abcdefghijklmnopqr</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true"></a><span class="fu">ping</span> data: rdma-ping-1: BCDEFGHIJKLMNOPQRSTUVWXYZ[<span class="dt">\]</span>^_<span class="kw">`</span>abcdefghijklmnopqrs</span></code></pre></div>
+<h2 id="check-rdma-bandwidth-and-latency">Check RDMA bandwidth and latency</h2>
+<h3 id="bandwidth">Bandwidth</h3>
+<ul>
+<li>vm1</li>
+</ul>
+<div class="sourceCode" id="cb15"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true"></a><span class="ex">vm1</span> $ ibv_devices</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true"></a>    <span class="ex">device</span>          	   node GUID</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true"></a>    <span class="ex">------</span>          	----------------</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true"></a>    <span class="ex">siw_ens3</span>        	5254001234560000</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true"></a>    <span class="ex">siw_lo</span>          	7369775f6c6f0000</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true"></a>    <span class="ex">siw_ens4</span>        	5254001234010000</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true"></a><span class="ex">vm1</span> $ sudo su</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true"></a><span class="ex">vm1</span> $ ulimit -l unlimited</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true"></a><span class="ex">vm1</span> $ ib_write_bw -R -d siw_ens4 -i 1  -D 10 -F</span></code></pre></div>
+<ul>
+<li>vm2</li>
+</ul>
+<div class="sourceCode" id="cb16"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true"></a><span class="ex">vm2</span> $ sudo su</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true"></a><span class="ex">vm2</span> $ ulimit -l unlimited</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true"></a><span class="ex">vm2</span> $ ib_write_bw -R -d siw_ens4 -i 1 -D 10 -F 10.0.0.1</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true"></a><span class="ex">...</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true"></a> <span class="co">#bytes     #iterations    BW peak[MB/sec]    BW average[MB/sec]   MsgRate[Mpps]</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true"></a> <span class="ex">65536</span>      3200             0.00               33.33  		   0.000533</span></code></pre></div>
+<p>The results are really lame but please remember we are using virtual environment so performance is always bad here</p>
+<h3 id="latency">Latency</h3>
+<ul>
+<li>vm1</li>
+</ul>
+<div class="sourceCode" id="cb17"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true"></a><span class="ex">vm1</span> $ ib_write_lat -R -d siw_ens4 -i 1  -D 10 -F</span></code></pre></div>
+<ul>
+<li>vm2</li>
+</ul>
+<div class="sourceCode" id="cb18"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true"></a><span class="ex">vm2</span> $ ib_write_lat -R -d siw_ens4 -i 1 -D 10 -F 10.0.0.1</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true"></a><span class="ex">...</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true"></a> <span class="co">#bytes        #iterations       t_avg[usec]</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true"></a> <span class="ex">2</span>             4316            695.11</span></code></pre></div>
+<p>Same lame results due to the nature of our virtual setup and the use of softiwarp instead of real RDMA capable hardware</p>
+<h1 id="summary">Summary</h1>
+<p>Now we have a working setup of two vm’s which can communicate using RDMA. In the next posts we are going to explore more interesting RDMA stuff.</p>]]></description>
+    <pubDate>Sat, 29 Apr 2017 00:00:00 UT</pubDate>
+    <guid>http://budevg.github.io/posts/2017-04-29-rdma-101-1.html</guid>
+    <dc:creator>Evgeny Budilovsky</dc:creator>
+</item>
+<item>
+    <title>World Of Podcasts</title>
+    <link>http://budevg.github.io/posts/2017-03-31-podcast-world.html</link>
+    <description><![CDATA[<p>There was a time when I was listening to radio on my way to work. When I went for a jogging I was hearing mostly music and sometimes audio books. Since radio was mostly boring politics and bad news, I’ve stopped with this waste of time. I started listening to podcasts.</p>
+<p>At first these were mostly podcasts related to my professional interests: programming, security and startups. Later I subscribed to more and more podcasts with more general content: science, sci-fi/mystery stories, theory of the mind, history, entrepreneurs life and more. Below is the list of podcasts that I currently enjoy the most. The podcasts are in English, Russian and Hebrew.</p>
+<h2 id="sci-fimysterythriller">Sci-Fi/Mystery/Thriller</h2>
+<ul>
+<li><a href="http://theblacktapespodcast.com">The Black Tapes</a></li>
+<li><a href="http://www.tanispodcast.com">Tanis</a></li>
+<li><a href="https://www.rabbitspodcast.com">Rabbits</a></li>
+<li><a href="https://gimletmedia.com/homecoming">Homecoming</a></li>
+<li><a href="http://themessagepodcast.com">The Message</a></li>
+<li><a href="http://lif-e.af/ter">LifeAfter</a></li>
+<li><a href="http://fantaskop.podfm.ru">Фантаскоп</a> (Russian)</li>
+<li><a href="https://geeksguideshow.com">Geek’s Guide to the Galaxy</a></li>
+<li><a href="https://soundcloud.com/decodingwestworld">Decoding Westworld</a></li>
+</ul>
+<h2 id="haskell">Haskell</h2>
+<ul>
+<li><a href="http://www.haskellcast.com">The Haskell Cast</a></li>
+<li><a href="https://bananasandlenses.net">Бананы и линзы</a> (Russian)</li>
+</ul>
+<h2 id="python">Python</h2>
+<ul>
+<li><a href="https://talkpython.fm">Talk Python To Me</a></li>
+</ul>
+<h2 id="go">Go</h2>
+<ul>
+<li><a href="http://golangshow.com">GolangShow</a> (Russian)</li>
+<li><a href="https://changelog.com/gotime">Go Time</a></li>
+</ul>
+<h2 id="cc">C/C++</h2>
+<ul>
+<li><a href="http://cppcast.libsyn.com">CppCast</a></li>
+</ul>
+<h2 id="storage">Storage</h2>
+<ul>
+<li><a href="http://silvertonconsulting.com/gbos2">GreyBeards on Storage</a></li>
+<li><a href="http://storageunpacked.com">Storage Unpacked</a></li>
+<li><a href="http://www.snia.org/sites/default/files/podcasts/SDC/SDCpodcast.xml">Storage Developer Conference</a></li>
+</ul>
+<h2 id="kernel">Kernel</h2>
+<ul>
+<li><a href="http://jcm.libsyn.com">Linux Kernel Podcast</a></li>
+</ul>
+<h2 id="entrepreneurs">Entrepreneurs</h2>
+<ul>
+<li><a href="https://awesound.com/@ycombinator/feed/how-to-start-a-startup">How to Start a Startup</a></li>
+<li><a href="https://gimletmedia.com/startup">StartUp</a></li>
+<li><a href="http://www.shavua.net">השבוע</a> (Hebrew)</li>
+<li><a href="http://www.npr.org/podcasts/510313/how-i-built-this">How I Built This</a></li>
+<li><a href="http://www.ranlevi.com/biz">עושים עסקים</a> (Hebrew)</li>
+<li><a href="http://creative.gimletmedia.com/shows/open-for-business/">Open For Business</a></li>
+<li><a href="https://semek.podbean.com">S-Emek</a> (Hebrew)</li>
+</ul>
+<h2 id="security">Security</h2>
+<ul>
+<li><a href="https://www.grc.com/securitynow.htm">Security Now</a></li>
+</ul>
+<h2 id="management">Management</h2>
+<ul>
+<li><a href="http://www.mngttips.com">טיפים בניהול</a> (Hebrew)</li>
+<li><a href="https://files.manager-tools.com/files/public/feeds/manager-tools-podcasts.xml">Manager Tools</a></li>
+</ul>
+<h2 id="programming-general">Programming general</h2>
+<ul>
+<li><a href="http://codepodcast.com">Code Podcast</a></li>
+<li><a href="https://radio-t.com">Радио-Т</a> (Russian)</li>
+<li><a href="https://sdcast.ksdaemon.ru">SDCast</a> (Russian)</li>
+<li><a href="https://theartofprogramming.podbean.com">The Art Of Programming</a> (Russian)</li>
+<li><a href="http://www.reversim.com">רברס עם פלטפורמה</a> (Hebrew)</li>
+<li><a href="http://razbor-poletov.com">Разбор Полетов</a> (Russian)</li>
+<li><a href="https://www.functionalgeekery.com">Functional Geekery</a></li>
+<li><a href="http://devzen.ru">DevZen Podcast</a> (Russian)</li>
+<li><a href="http://testandcode.com">Test and Code</a></li>
+<li><a href="https://changelog.com/podcast">The Changelog</a></li>
+<li><a href="http://softwareengineeringdaily.com">Software Engineering Daily</a></li>
+</ul>
+<h2 id="sciencehistorypeople">Science/History/People</h2>
+<ul>
+<li><a href="http://www.ranlevi.com">עושים היסטוריה</a> (Hebrew)</li>
+<li><a href="http://www.cmpod.net">Curious Minds Podcast</a></li>
+<li><a href="https://gimletmedia.com/science-vs">Science Vs</a></li>
+<li><a href="http://www.radiolab.org">Radiolab</a></li>
+<li><a href="https://gimletmedia.com/reply-all">Reply All</a></li>
+<li><a href="https://www.bloomberg.com/podcasts/decrypted">Decrypted</a></li>
+<li><a href="https://gimletmedia.com/surprisingly-awesome">Surprisingly Awesome</a></li>
+<li><a href="https://gimletmedia.com/heavyweight">Heavyweight</a></li>
+<li><a href="https://gimletmedia.com/undone">Undone</a></li>
+<li><a href="http://www.npr.org/podcasts/510307/invisibilia">Invisibilia</a></li>
+<li><a href="https://geekonomy.net">גיקונומי</a> (Hebrew)</li>
+<li><a href="https://soundcloud.com/jewish-boys">Two Nice Jewish Boys</a></li>
+<li><a href="https://gimletmedia.com/mystery-show">Mystery Show</a></li>
+</ul>
+<h2 id="mindself-improve">Mind/Self Improve</h2>
+<ul>
+<li><a href="http://www.npr.org/series/423302056/hidden-brain">Hidden Brain</a></li>
+<li><a href="http://metalearn.libsyn.com">MetaLearn</a></li>
+</ul>
+<h2 id="financial">Financial</h2>
+<ul>
+<li><a href="http://www.ranlevi.com/shivuk">עושים שיווק</a> (Hebrew)</li>
+<li><a href="http://www.npr.org/sections/money">Planet Money</a></li>
+<li><a href="http://www.added-value.co">ערך מוסף</a> (Hebrew)</li>
+</ul>
+<h2 id="travel">Travel</h2>
+<ul>
+<li><a href="http://www.ranlevi.com/tiuol">עושים טיול</a> (Hebrew)</li>
+</ul>]]></description>
+    <pubDate>Fri, 31 Mar 2017 00:00:00 UT</pubDate>
+    <guid>http://budevg.github.io/posts/2017-03-31-podcast-world.html</guid>
+    <dc:creator>Evgeny Budilovsky</dc:creator>
+</item>
+<item>
+    <title>Storage presentation in Kernel TLV meetup</title>
+    <link>http://budevg.github.io/posts/2016-01-14-storage-kernel-meetup.html</link>
+    <description><![CDATA[<p>There was another really nice meetup at the local <a href="http://www.meetup.com/Tel-Aviv-Yafo-Linux-Kernel-Meetup/events/227539106/">Tel-Aviv kernel meetup group</a>. This meetup group which is organized by <a href="http://www.meetup.com/Tel-Aviv-Yafo-Linux-Kernel-Meetup/members/82534572/">Kfir Gollan</a> has really great community of people all around Israel’s hitech arena.</p>
+<p>In the first lecture <a href="https://github.com/veltzer">Mark Veltzer</a> was talking about locks in userspace and kernel. Awesome topic which is so much important for daily programming in the land of c.</p>
+<p>After that I did a presentation about <strong>High performance storage devices</strong> <a href="/static/files/presentations/high-performance-storage-devices-in-kernel.pdf">slides</a> <a href="https://www.youtube.com/watch?v=B5Eg-gq2P1M">video</a>.</p>
+<p>At the end there was a nice discussion about the fact that storage has many things in common with networking and that many problems which were already solved in the networking world are being solved today in storage.</p>]]></description>
+    <pubDate>Thu, 14 Jan 2016 00:00:00 UT</pubDate>
+    <guid>http://budevg.github.io/posts/2016-01-14-storage-kernel-meetup.html</guid>
+    <dc:creator>Evgeny Budilovsky</dc:creator>
+</item>
+
+    </channel>
+</rss>

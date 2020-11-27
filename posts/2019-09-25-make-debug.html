@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width">
+    <link rel="icon" type="image/png" href="../static/images/pencil.ico">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <title>Evgeny Budilovsky - Debugging Makefile</title>
+
+    <!-- Stylesheets. -->
+    <link rel="stylesheet" type="text/css" href="../style.css?v=0">
+
+    <!-- RSS. -->
+    <link rel="alternate" type="application/rss+xml" title="Evgeny Budilovsky - a personal blog" href="../rss.xml">
+
+    <!-- Metadata. -->
+    <meta name="keywords" content="Evgeny Budilovsky,blog,programming,coding,linux,functional programming,personal,homepage,kernel,storage,network,virtualization,cloud">
+    <meta name="description" content="Personal home page and blog of Evgeny Budilovsky">
+  </head>
+  <body>
+    <div id="navigation">
+      <h1>Blog</h1>
+      <a href="../">Home</a>
+      <a href="../posts.html">Posts</a>
+      <h1>Links</h1>
+      <a href="http://github.com/budevg">
+        <i class="fa fa-github github-color" aria-hidden="true"></i>
+        GitHub
+      </a>
+      <a href="http://twitter.com/budevg">
+        <i class="fa fa-twitter twitter-color" aria-hidden="true"></i>
+        Twitter
+      </a>
+      <a href="https://www.linkedin.com/in/budevg">
+        <i class="fa fa-linkedin linkedin-color" aria-hidden="true"></i>
+        LinkedIn
+      </a>
+      <a type="application/rss+xml" href="../rss.xml">
+        <i class="fa fa-rss rss-color" aria-hidden="true"></i>
+        RSS
+      </a>
+    </div>
+
+    <div id="content">
+    <h1>Debugging Makefile</h1>
+<div class="soft">
+    How to debug make files<br />
+    Published on September 25, 2019 under the tag <a title="All pages tagged 'debug'." href="../tags/debug.html">debug</a>, <a title="All pages tagged 'make'." href="../tags/make.html">make</a>
+</div>
+
+<p>Makefiles can become pretty complicated and you can spend many hours trying to understand what’s going on in the build systems. Let’s create a basic make file.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode makefile"><code class="sourceCode makefile"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="dt">OBJS </span><span class="ch">:=</span><span class="st"> a.o b.o c.o</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="dt">TARGET </span><span class="ch">:=</span><span class="st"> app</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="dv">%.o:</span><span class="dt"> %.c</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>	gcc -o <span class="ch">$@</span> <span class="ch">$&lt;</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a><span class="dv">$(TARGET):</span><span class="dt"> </span><span class="ch">$(</span><span class="dt">OBJS</span><span class="ch">)</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>	ld -o <span class="ch">$@</span> <span class="ch">$^</span></span></code></pre></div>
+<p>let’s say we are not sure what’s inside the <code>OBJS</code> variable. We can add the following target to the makefile</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode makefile"><code class="sourceCode makefile"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="dv">print-%:</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>	<span class="ch">@</span><span class="fu">echo </span><span class="st">'</span><span class="ch">$*</span><span class="st">=</span><span class="ch">$($*)</span><span class="st">'</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>	<span class="ch">@</span><span class="fu">echo </span><span class="st">'  origin = </span><span class="ch">$(</span><span class="kw">origin</span><span class="st"> </span><span class="ch">$*)</span><span class="st">'</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>	<span class="ch">@</span><span class="fu">echo </span><span class="st">'  flavor = </span><span class="ch">$(</span><span class="kw">flavor</span><span class="st"> </span><span class="ch">$*)</span><span class="st">'</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>	<span class="ch">@</span><span class="fu">echo </span><span class="st">'   value = </span><span class="ch">$(</span><span class="kw">value</span><span class="st">  </span><span class="ch">$*)</span><span class="st">'</span></span></code></pre></div>
+<p>and run</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>$ <span class="fu">make</span> print-OBJS</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="va">OBJS=</span>a.o <span class="ex">b.o</span> c.o</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>  <span class="ex">origin</span> = file</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a>  <span class="ex">flavor</span> = simple</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>  <span class="ex">value</span> = a.o b.o c.o</span></code></pre></div>
+<p>to get value of the variable.</p>
+
+
+    <div style="clear: both"></div>
+
+    <div id="footer">
+    </div>
+</div>
+
+  </body>
+</html>

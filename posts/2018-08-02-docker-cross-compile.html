@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width">
+    <link rel="icon" type="image/png" href="../static/images/pencil.ico">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <title>Evgeny Budilovsky - Cross compiling inside docker</title>
+
+    <!-- Stylesheets. -->
+    <link rel="stylesheet" type="text/css" href="../style.css?v=0">
+
+    <!-- RSS. -->
+    <link rel="alternate" type="application/rss+xml" title="Evgeny Budilovsky - a personal blog" href="../rss.xml">
+
+    <!-- Metadata. -->
+    <meta name="keywords" content="Evgeny Budilovsky,blog,programming,coding,linux,functional programming,personal,homepage,kernel,storage,network,virtualization,cloud">
+    <meta name="description" content="Personal home page and blog of Evgeny Budilovsky">
+  </head>
+  <body>
+    <div id="navigation">
+      <h1>Blog</h1>
+      <a href="../">Home</a>
+      <a href="../posts.html">Posts</a>
+      <h1>Links</h1>
+      <a href="http://github.com/budevg">
+        <i class="fa fa-github github-color" aria-hidden="true"></i>
+        GitHub
+      </a>
+      <a href="http://twitter.com/budevg">
+        <i class="fa fa-twitter twitter-color" aria-hidden="true"></i>
+        Twitter
+      </a>
+      <a href="https://www.linkedin.com/in/budevg">
+        <i class="fa fa-linkedin linkedin-color" aria-hidden="true"></i>
+        LinkedIn
+      </a>
+      <a type="application/rss+xml" href="../rss.xml">
+        <i class="fa fa-rss rss-color" aria-hidden="true"></i>
+        RSS
+      </a>
+    </div>
+
+    <div id="content">
+    <h1>Cross compiling inside docker</h1>
+<div class="soft">
+    Using docker for cross compilation<br />
+    Published on August  2, 2018 under the tag <a title="All pages tagged 'docker'." href="../tags/docker.html">docker</a>, <a title="All pages tagged 'qemu'." href="../tags/qemu.html">qemu</a>, <a title="All pages tagged 'crooss-compilation'." href="../tags/crooss-compilation.html">crooss-compilation</a>, <a title="All pages tagged 'virtualization'." href="../tags/virtualization.html">virtualization</a>
+</div>
+
+<p>Recently I needed to compile binaries for arm64 cpu. The fastest way to do this is to build cross compilation toolchain and to run x86 gcc that will generate arm64 executables.</p>
+<p>Another way to do this is to use qemu’s user emulation. This feature of qemu allows to run executables that were compiled for different architecture on the x86 host by emulating the architecture and translating the system calls abi between the different architectures.</p>
+<p>We can start by getting docker image with aarch64 centos file system.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="ex">docker</span> pull aarch64/alpine</span></code></pre></div>
+<p>If we try to run our image we will get execution format error</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="ex">docker</span> run -it aarch64/alpine /bin/sh</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="ex">standard_init_linux.go</span>:195: exec user process caused <span class="st">&quot;exec format error&quot;</span></span></code></pre></div>
+<p>This is since we are trying to run aarch64 executable on x86 machine. By looking inside the image root file system we can see that the binary is an ARM aarch64 binary.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>$ <span class="fu">sudo</span> file <span class="kw">`</span><span class="ex">d</span> inspect aarch64/alpine -f <span class="st">'{{.GraphDriver.Data.RootDir}}'</span><span class="kw">`</span>/bin/busybox</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="ex">/docker/overlay/edfece616e612e0aee33cfa5d0efe2b23c563d46ea232b2938d0e9c39a61273c/root/bin</span>/busybox: <span class="ex">ELF</span> 64-bit LSB shared object, ARM aarch64, version 1 (SYSV), <span class="ex">dynamically</span> linked, interpreter /lib/ld-musl-aarch64.so.1, stripped</span></code></pre></div>
+<p>To help us in running these arm64 binaries we can use the qemu’s user emulation. Firs we are going to compile static version of qemu’s user emulation for arm64 architecture.</p>
+<p>We can use the following docker file to build the statically linked qemu inside docker instance. Edit <code>Dockerfile:</code></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="ex">FROM</span> centos:7</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="ex">RUN</span> set -x <span class="kw">\</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a>    <span class="kw">&amp;&amp;</span> <span class="ex">yum</span> groupinstall -y development <span class="kw">\</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a>    <span class="kw">&amp;&amp;</span> <span class="ex">yum</span> install -y yum install wget glibc-static zlib-static pcre-static glib2-static</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a><span class="ex">RUN</span> set -x <span class="kw">\</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a>    <span class="kw">&amp;&amp;</span> <span class="fu">mkdir</span> /data <span class="kw">\</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a>    <span class="kw">&amp;&amp;</span> <span class="bu">cd</span> /data <span class="kw">\</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a>    <span class="kw">&amp;&amp;</span> <span class="fu">wget</span> https://github.com/qemu/qemu/archive/v2.12.0.tar.gz <span class="kw">\</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true"></a>    <span class="kw">&amp;&amp;</span> <span class="fu">tar</span> xvf *.tar.gz <span class="kw">\</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true"></a>    <span class="kw">&amp;&amp;</span> <span class="bu">cd</span> qemu-2.12.0 <span class="kw">\</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true"></a>    <span class="kw">&amp;&amp;</span> <span class="ex">./configure</span> --target-list=aarch64-linux-user --enable-linux-user --disable-system --disable-tools --static <span class="kw">\</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true"></a>    <span class="kw">&amp;&amp;</span> <span class="fu">make</span> -j4</span></code></pre></div>
+<p>Then we can copy the executable from it using</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="ex">docker</span> build -t build-env .</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="ex">docker</span> run --rm --name build-env-instance -dt build-env /bin/bash</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a><span class="ex">docker</span> cp build-env-instance:/data/qemu-2.12.0/aarch64-linux-user/qemu-aarch64 .</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a><span class="ex">docker</span> stop build-env-instance</span></code></pre></div>
+<p>Now we have qemu-aarch64 in our current directory. Let’s use it to build docker instance that can run aarch64 executables. Edit <code>Dockerfile.aarch64</code></p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="ex">FROM</span> aarch64/alpine</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a><span class="ex">ADD</span> qemu-aarch64 /</span></code></pre></div>
+<p>Let’s build it and try to run it.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="ex">docker</span> build -t my-aarch64-env -f Dockerfile.aarch64 .</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a><span class="ex">docker</span> run --rm -it my-aarch64-env /bin/sh</span></code></pre></div>
+<p>But we are still getting:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="ex">standard_init_linux.go</span>:195: exec user process caused <span class="st">&quot;exec format error&quot;</span></span></code></pre></div>
+<p>The last step is to instruct our kernel to apply the qemu-aarch64 interpreter each time we running arm64 elf file. This can be done using</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="co"># if /proc/sys/fs/binfmt_misc is not mounted</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a><span class="fu">sudo</span> mount binfmt_misc -t binfmt_misc /proc/sys/fs/binfmt_misc</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a><span class="fu">sudo</span> bash -c <span class="st">&quot;echo ':aarch64:M::\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\xb7\x00:\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff:/qemu-aarch64:' &gt; /proc/sys/fs/binfmt_misc/register&quot;</span></span></code></pre></div>
+<p>And now we can run and compile arm64 code on x86</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a><span class="ex">docker</span> run --rm -it my-aarch64-env /bin/sh</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a>$ <span class="fu">uname</span> -m</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a><span class="ex">aarch64</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true"></a>$ <span class="ex">apk</span> update -q</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true"></a>$ <span class="ex">apk</span> add -q file</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true"></a>$ <span class="fu">file</span> /bin/busybox</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true"></a><span class="ex">/bin</span>/busybox: <span class="ex">ELF</span> 64-bit LSB shared object, ARM aarch64, version 1 (SYSV), <span class="ex">dynamically</span> linked, interpreter /lib/ld-musl-aarch64.so.1, stripped</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true"></a>$ <span class="ex">apk</span> add gcc libc-dev -q</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true"></a>$ <span class="bu">echo</span> <span class="st">'int main() { printf(&quot;hello world\n&quot;); }'</span> <span class="op">&gt;</span> 1.c</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true"></a>$ <span class="fu">gcc</span> 1.c</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true"></a><span class="ex">1.c</span>: In function <span class="st">'main'</span>:</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true"></a><span class="ex">1.c</span>:1:14: warning: implicit declaration of function <span class="st">'printf'</span> [-Wimplicit-function-declaration]</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true"></a> <span class="ex">int</span> main() <span class="kw">{</span> <span class="bu">printf</span>(<span class="st">&quot;hello world\n&quot;</span>); <span class="kw">}</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true"></a>              ^<span class="ex">~~~~~</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true"></a><span class="ex">1.c</span>:1:14: warning: incompatible implicit declaration of built-in function <span class="st">'printf'</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true"></a><span class="ex">1.c</span>:1:14: note: include <span class="st">'&lt;stdio.h&gt;'</span> or provide a declaration of <span class="st">'printf'</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true"></a>$ <span class="ex">./a.out</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true"></a><span class="ex">hello</span> world</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true"></a>$ <span class="fu">file</span> a.out</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true"></a><span class="ex">a.out</span>: ELF 64-bit LSB shared object, ARM aarch64, version 1 (SYSV), <span class="ex">dynamically</span> linked, interpreter /lib/ld-musl-aarch64.so.1, not stripped</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true"></a>$</span></code></pre></div>
+<p>If we run ps on our host we can see that the /bin/sh in the container is actually executed using the qemu-aarch64 interpreter</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a>$ <span class="fu">ps</span> -ef <span class="kw">|</span><span class="fu">grep</span> qemu <span class="kw">|</span><span class="fu">grep</span> -v grep</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true"></a><span class="ex">root</span>     16389 16362  0 12:14 pts/0    00:00:00 /qemu-aarch64 /bin/sh</span></code></pre></div>
+
+
+    <div style="clear: both"></div>
+
+    <div id="footer">
+    </div>
+</div>
+
+  </body>
+</html>
