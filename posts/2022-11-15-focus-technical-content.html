@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width">
+    <link rel="icon" type="image/png" href="../static/images/pencil.ico">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <title>Evgeny Budilovsky - How to focus on technical content</title>
+
+    <!-- Stylesheets. -->
+    <link rel="stylesheet" type="text/css" href="../style.css?v=0">
+
+    <!-- RSS. -->
+    <link rel="alternate" type="application/rss+xml" title="Evgeny Budilovsky - a personal blog" href="../rss.xml">
+
+    <!-- Metadata. -->
+    <meta name="keywords" content="Evgeny Budilovsky,blog,programming,coding,linux,functional programming,personal,homepage,kernel,storage,network,virtualization,cloud">
+    <meta name="description" content="Personal home page and blog of Evgeny Budilovsky">
+  </head>
+  <body>
+    <div id="navigation">
+      <h1>Blog</h1>
+      <a href="../">Home</a>
+      <a href="../posts.html">Posts</a>
+      <h1>Links</h1>
+      <a href="http://github.com/budevg">
+        <i class="fa fa-github github-color" aria-hidden="true"></i>
+        GitHub
+      </a>
+      <a href="http://twitter.com/budevg">
+        <i class="fa fa-twitter twitter-color" aria-hidden="true"></i>
+        Twitter
+      </a>
+      <a href="https://www.linkedin.com/in/budevg">
+        <i class="fa fa-linkedin linkedin-color" aria-hidden="true"></i>
+        LinkedIn
+      </a>
+      <a type="application/rss+xml" href="../rss.xml">
+        <i class="fa fa-rss rss-color" aria-hidden="true"></i>
+        RSS
+      </a>
+    </div>
+
+    <div id="content">
+    <h1>How to focus on technical content</h1>
+<div class="soft">
+    Tips on how to improve consumtion of technical content<br />
+    Published on November 15, 2022 under the tag <a title="All pages tagged 'productivity'." href="../tags/productivity.html">productivity</a>, <a title="All pages tagged 'emacs'." href="../tags/emacs.html">emacs</a>
+</div>
+
+<p>As a software developers we are in a constant race. The world of programming is
+constantly changing. There are new technologies, paradigms, frameworks and
+tools. To learn new things and stay relevant, true hackers develop a super
+skill. The ability to skim information quickly, focus on important things,
+filter the rest.</p>
+<p><img src="../static/files/posts/2022_11_15/fast.png" style="width:30.0%;height:30.0%" /></p>
+<p>This awesome ability allows us to jump into unknown code, start using new
+framework or even learn new programming language in matter of hours or days.
+And that what is needed to work in industry with high rate of change in
+requirements and features required by customers. At the end of the day your
+brain is trained to do the <strong>skimming automatically</strong> and this is
+<strong>not always good</strong>.</p>
+<p>For me the realization of something wrong came out some time ago when I was
+trying to read new book on <code>Haskell</code>. I really wanted to enjoy the book and learn
+few new things about the language which I already knew. But I’ve found myself
+constantly jumping and skipping content. I was not focusing on the language of
+the author, that did amazing job and had some deep insights on the language and
+the functional programming paradigm.</p>
+<p>Instead of focusing on the words and
+learning new information, my brain was focusing on cycle of <code>finding</code> new things,
+<code>alert</code> me about them, <code>discarding</code> them and repeating the cycle again. Same
+experience repeated when I was reading blogs, browsing sites and in general when
+I was consuming new technical content.</p>
+<p>The solution for me was to <strong>slow down</strong> and reduce the distractions around the
+content I consume. I am a long-time emacs user. One of the core principals in
+emacs is <code>text as universal interface</code>. This means that you can do almost any
+task using powerful text interfaces. Web browsing is one of the things you can
+do without moving out from emacs.</p>
+<p><img src="../static/files/posts/2022_11_15/neo-slow-down.jpg" style="width:50.0%;height:50.0%" /></p>
+<p>The <a href="https://www.gnu.org/software/emacs/manual/html_mono/eww.html">eww package</a>
+allows you to browse sites in emacs and to display the textual information
+without leaving the emacs editor. It doesn’t run the fancy javascript code,
+which between us mostly used to track and collect information about you. I
+disabled the display of images by default. Mostly what I get is a clean text
+containing information and in case of emergency I can just jump to
+firefox/chrome using shortcut key.</p>
+<p>Using textual browser allowed me to focus on blogs and articles I consume
+without all the visual distractions around them.</p>
+<p><img src="../static/files/posts/2022_11_15/browse-lwn.png" /></p>
+<p>The second method I discovered was when I wanted to master <strong>touch typing</strong>
+technique. I am programming for almost 20 years (ouch !!!) but most of my career
+I wasn’t trying to type completely without looking at the keyboard. I was typing
+pretty fast and using emacs with all the shortcuts allowed me to stream my code
+very efficiently. But I didn’t try to type using the “home row method” and
+without looking at the keyboard at all. Then one day it hit me: I am already
+spending most of my time using keyboard so why not make an effort and master the
+typing techniques.</p>
+<p>So I started to learn <code>touch typing</code> and almost every tutorial on this subject
+will tell you that you need to practice to build the muscle memory. There are a
+lot of good sites like <a href="https://www.keybr.com">keybr.com</a>. But since I am an
+emacs user I can just find a package that allows me to practice without leaving
+the editor. I took the excellent <a href="https://github.com/hagleitn/speed-type">speed-type</a>
+emacs extension and configured it to allow selecting any chunk of text in the
+editor and practice typing on it (it will color correct letters in green, and
+show me my speed statistics when I want).</p>
+<p>Soon I learned that I can use this extension to focus more deeply on text. I
+would browse to some interesting article let’s say in
+<a href="https://news.ycombinator.com/">hacker news</a> using eww. I will switch to touch
+typing practicing mode with the content of the article and I will type it. This
+allows to slow down since average touch typing speed (<strong>60-70</strong> words per minute)
+is much slower then average reading speed (<strong>250</strong> words per minute). Then you are
+reading and typing the article in much slower phase but at the same time your
+mind is focusing on the words and your fingers build muscle memory to improve
+typing speed. <strong>Win Win.</strong></p>
+<p><img src="../static/files/posts/2022_11_15/touch-typing.png" /></p>
+
+
+    <div style="clear: both"></div>
+
+    <div id="footer">
+    </div>
+</div>
+
+  </body>
+</html>

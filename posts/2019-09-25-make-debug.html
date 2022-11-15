@@ -49,27 +49,29 @@
     Published on September 25, 2019 under the tag <a title="All pages tagged 'debug'." href="../tags/debug.html">debug</a>, <a title="All pages tagged 'make'." href="../tags/make.html">make</a>
 </div>
 
-<p>Makefiles can become pretty complicated and you can spend many hours trying to understand what’s going on in the build systems. Let’s create a basic make file.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode makefile"><code class="sourceCode makefile"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="dt">OBJS </span><span class="ch">:=</span><span class="st"> a.o b.o c.o</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="dt">TARGET </span><span class="ch">:=</span><span class="st"> app</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="dv">%.o:</span><span class="dt"> %.c</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>	gcc -o <span class="ch">$@</span> <span class="ch">$&lt;</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a><span class="dv">$(TARGET):</span><span class="dt"> </span><span class="ch">$(</span><span class="dt">OBJS</span><span class="ch">)</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>	ld -o <span class="ch">$@</span> <span class="ch">$^</span></span></code></pre></div>
-<p>let’s say we are not sure what’s inside the <code>OBJS</code> variable. We can add the following target to the makefile</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode makefile"><code class="sourceCode makefile"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="dv">print-%:</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>	<span class="ch">@</span><span class="fu">echo </span><span class="st">'</span><span class="ch">$*</span><span class="st">=</span><span class="ch">$($*)</span><span class="st">'</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>	<span class="ch">@</span><span class="fu">echo </span><span class="st">'  origin = </span><span class="ch">$(</span><span class="kw">origin</span><span class="st"> </span><span class="ch">$*)</span><span class="st">'</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>	<span class="ch">@</span><span class="fu">echo </span><span class="st">'  flavor = </span><span class="ch">$(</span><span class="kw">flavor</span><span class="st"> </span><span class="ch">$*)</span><span class="st">'</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>	<span class="ch">@</span><span class="fu">echo </span><span class="st">'   value = </span><span class="ch">$(</span><span class="kw">value</span><span class="st">  </span><span class="ch">$*)</span><span class="st">'</span></span></code></pre></div>
+<p>Makefiles can become pretty complicated and you can spend many hours trying to
+understand what’s going on in the build systems. Let’s create a basic make file.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode makefile"><code class="sourceCode makefile"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">OBJS </span><span class="ch">:=</span><span class="st"> a.o b.o c.o</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="dt">TARGET </span><span class="ch">:=</span><span class="st"> app</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="dv">%.o:</span><span class="dt"> %.c</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>	gcc -o <span class="ch">$@</span> <span class="ch">$&lt;</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="dv">$(TARGET):</span><span class="dt"> </span><span class="ch">$(</span><span class="dt">OBJS</span><span class="ch">)</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>	ld -o <span class="ch">$@</span> <span class="ch">$^</span></span></code></pre></div>
+<p>let’s say we are not sure what’s inside the <code>OBJS</code> variable. We can add the
+following target to the makefile</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode makefile"><code class="sourceCode makefile"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="dv">print-%:</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>	<span class="ch">@</span><span class="fu">echo </span><span class="st">'</span><span class="ch">$*</span><span class="st">=</span><span class="ch">$($*)</span><span class="st">'</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>	<span class="ch">@</span><span class="fu">echo </span><span class="st">'  origin = </span><span class="ch">$(</span><span class="kw">origin</span><span class="st"> </span><span class="ch">$*)</span><span class="st">'</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>	<span class="ch">@</span><span class="fu">echo </span><span class="st">'  flavor = </span><span class="ch">$(</span><span class="kw">flavor</span><span class="st"> </span><span class="ch">$*)</span><span class="st">'</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>	<span class="ch">@</span><span class="fu">echo </span><span class="st">'   value = </span><span class="ch">$(</span><span class="kw">value</span><span class="st">  </span><span class="ch">$*)</span><span class="st">'</span></span></code></pre></div>
 <p>and run</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>$ <span class="fu">make</span> print-OBJS</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="va">OBJS=</span>a.o <span class="ex">b.o</span> c.o</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>  <span class="ex">origin</span> = file</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a>  <span class="ex">flavor</span> = simple</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>  <span class="ex">value</span> = a.o b.o c.o</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> make print-OBJS</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="va">OBJS</span><span class="op">=</span>a.o <span class="ex">b.o</span> c.o</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="ex">origin</span> = file</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="ex">flavor</span> = simple</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="ex">value</span> = a.o b.o c.o</span></code></pre></div>
 <p>to get value of the variable.</p>
 
 

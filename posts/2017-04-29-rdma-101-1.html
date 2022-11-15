@@ -49,149 +49,169 @@
     Published on April 29, 2017 under the tag <a title="All pages tagged 'storage'." href="../tags/storage.html">storage</a>, <a title="All pages tagged 'rdma'." href="../tags/rdma.html">rdma</a>, <a title="All pages tagged 'qemu'." href="../tags/qemu.html">qemu</a>
 </div>
 
-<p>We are going to explore RDMA and it’s applications in a series of tutorials starting with this one.</p>
-<p>The first step is to build virtual environment where we can run our applications. Usually RDMA communication requires special RDMA capable NIC on your server. Many vendors, such as <a href="https://www.mellanox.com/">Mellanox</a>, sell this hardware but for our development effort we are going to build a virtual environment based on <a href="http://www.qemu-project.org/">qemu</a> and <a href="https://github.com/zrlio/softiwarp">softiwarp</a> software.</p>
+<p>We are going to explore RDMA and it’s applications in a series of tutorials
+starting with this one.</p>
+<p>The first step is to build virtual environment where we can run our applications.
+Usually RDMA communication requires special RDMA capable
+NIC on your server. Many vendors, such as
+<a href="https://www.mellanox.com/">Mellanox</a>, sell this hardware but for
+our development effort we are going to build a virtual environment based on
+<a href="http://www.qemu-project.org/">qemu</a> and
+<a href="https://github.com/zrlio/softiwarp">softiwarp</a> software.</p>
 <h2 id="virtual-environment">Virtual environment</h2>
 <h3 id="base-image">Base image</h3>
-<p>We start with ubuntu 16.04.2 qemu image. It has linux kernel 4.8 installed and a basic development tools</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a>$ <span class="fu">sudo</span> apt-get install linux-generic-hwe-16.04 build-essential <span class="kw">\</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>                       <span class="fu">automake</span> autoconf libtool</span></code></pre></div>
-<p>Let’s call this image <code>ubuntu-16.04.2-dev</code>. We are going to create another image based on this image with all the rdma stack installed on it called <code>ubuntu-rdma.qcow2</code></p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>$ <span class="ex">qemu-img</span> create -f qcow2 -b ubuntu-16.04.2-dev ubuntu-rdma.qcow2</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="ex">Formatting</span> <span class="st">'ubuntu-rdma.qcow2'</span> ...</span></code></pre></div>
+<p>We start with ubuntu 16.04.2 qemu image. It has linux kernel 4.8 installed and
+a basic development tools</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo apt-get install linux-generic-hwe-16.04 build-essential <span class="dt">\</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>                       automake autoconf libtool</span></code></pre></div>
+<p>Let’s call this image <code>ubuntu-16.04.2-dev</code>. We are going to create another
+image based on this image with all the rdma stack installed on it
+called <code>ubuntu-rdma.qcow2</code></p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> qemu-img create <span class="at">-f</span> qcow2 <span class="at">-b</span> ubuntu-16.04.2-dev ubuntu-rdma.qcow2</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">Formatting</span> <span class="st">'ubuntu-rdma.qcow2'</span> ...</span></code></pre></div>
 <p>Let’s start a guest and install RDMA stack inside of it.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="ex">kvm</span> -m 1G <span class="kw">\</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="ex">-netdev</span> user,hostfwd=tcp::5555-:22,id=net0 <span class="kw">\</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="ex">-device</span> virtio-net-pci,netdev=net0 <span class="kw">\</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a><span class="ex">-drive</span> if=virtio,file=ubuntu-rdma.qcow2,cache=unsafe</span></code></pre></div>
-<p>We can ssh to guest through local port 5555 which is redirected to port 22 on guest.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kvm</span> <span class="at">-m</span> 1G <span class="dt">\</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>-netdev user,hostfwd=tcp::5555-:22,id=net0 <span class="dt">\</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>-device virtio-net-pci,netdev=net0 <span class="dt">\</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>-drive if=virtio,file=ubuntu-rdma.qcow2,cache=unsafe</span></code></pre></div>
+<p>We can ssh to guest through local port 5555 which is redirected to port
+22 on guest.</p>
 <h3 id="install-rdma-libraries-and-tools">Install RDMA libraries and tools</h3>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>$ <span class="fu">sudo</span> apt-get install libibverbs-dev librdmacm-dev <span class="kw">\</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>                       <span class="ex">rdmacm-utils</span> perftest ibverbs-utils</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo apt-get install libibverbs-dev librdmacm-dev <span class="dt">\</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>                       rdmacm-utils perftest ibverbs-utils</span></code></pre></div>
 <h3 id="install-softiwarp">Install SoftiWARP</h3>
-<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a>$ <span class="fu">git</span> clone https://github.com/zrlio/softiwarp.git</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="ex">...</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a>$ <span class="bu">pushd</span> softiwarp/kernel</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a>$ <span class="fu">make</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a>$ <span class="fu">sudo</span> mkdir -p /lib/modules/<span class="kw">`</span><span class="fu">uname</span> -r<span class="kw">`</span>/kernel/extra</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a>$ <span class="fu">sudo</span> cp siw.ko /lib/modules/<span class="kw">`</span><span class="fu">uname</span> -r<span class="kw">`</span>/kernel/extra</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a>$ <span class="fu">sudo</span> depmod -a</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true"></a>$ <span class="bu">popd</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true"></a>$ <span class="bu">pushd</span> softiwarp/userlib</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true"></a>$ <span class="ex">./autogen.sh</span> <span class="kw">&amp;&amp;</span> <span class="ex">./configure</span> --prefix= <span class="kw">&amp;&amp;</span> <span class="fu">make</span> <span class="kw">&amp;&amp;</span> <span class="fu">sudo</span> make install</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> git clone https://github.com/zrlio/softiwarp.git</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> pushd softiwarp/kernel</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> make</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo mkdir <span class="at">-p</span> /lib/modules/<span class="kw">`</span><span class="fu">uname</span> <span class="at">-r</span><span class="kw">`</span>/kernel/extra</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo cp siw.ko /lib/modules/<span class="kw">`</span><span class="fu">uname</span> <span class="at">-r</span><span class="kw">`</span>/kernel/extra</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo depmod <span class="at">-a</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> popd</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> pushd softiwarp/userlib</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> ./autogen.sh <span class="kw">&amp;&amp;</span> <span class="ex">./configure</span> <span class="at">--prefix</span><span class="op">=</span> <span class="kw">&amp;&amp;</span> <span class="fu">make</span> <span class="kw">&amp;&amp;</span> <span class="fu">sudo</span> make install</span></code></pre></div>
 <h3 id="shutdown">Shutdown</h3>
-<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="fu">sudo</span> shutdown -h now</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> shutdown <span class="at">-h</span> now</span></code></pre></div>
 <h3 id="create-two-guests">Create two guests</h3>
-<p>Based on the <code>ubuntu-rdma.qcow2</code> image we just created let’s build two images <code>vm1.qcow2</code> and <code>vm2.qcow2</code></p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a>$ <span class="kw">for</span> <span class="ex">i</span> in <span class="dt">{1..2}</span><span class="kw">;</span> <span class="kw">do</span> <span class="ex">qemu-img</span> create -f qcow2 -b ubuntu-rdma.qcow2 vm<span class="va">${i}</span>.qcow2<span class="kw">;</span> <span class="kw">done</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a>$ <span class="fu">ls</span> vm*</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a><span class="ex">vm1.qcow2</span>  vm2.qcow2</span></code></pre></div>
-<p>Now we are going to run both guest. Each of them will have two network interfaces. The first interface is configured to allow access from the guest to the internet and to allow access from the host to the guest’s ssh service by connecting to local port 5551 (or 5552 for second vm). The second network interface will be used for rdma access we are going to use qemu’s feature to create network using UDP multicast socket.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="kw">for</span> <span class="ex">i</span> in <span class="dt">{1..2}</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a><span class="kw">do</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a>  <span class="ex">kvm</span> -name vm<span class="va">${i}</span> -m 1G <span class="kw">\</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true"></a>      <span class="ex">-netdev</span> user,hostfwd=tcp::555<span class="va">${i}</span>-:22,id=net0 <span class="kw">\</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true"></a>      <span class="ex">-device</span> virtio-net-pci,netdev=net0 <span class="kw">\</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true"></a>      <span class="ex">-netdev</span> socket,mcast=230.0.0.1:1234,id=net1 <span class="kw">\</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true"></a>      <span class="ex">-device</span> virtio-net-pci,mac=52:54:00:12:34:0<span class="va">${i}</span>,netdev=net1 <span class="kw">\</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true"></a>      <span class="ex">-drive</span> if=virtio,file=vm<span class="va">${i}</span>.qcow2,cache=unsafe <span class="kw">&amp;</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true"></a><span class="kw">done</span></span></code></pre></div>
+<p>Based on the <code>ubuntu-rdma.qcow2</code> image we just created let’s build two
+images <code>vm1.qcow2</code> and <code>vm2.qcow2</code></p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> for i in <span class="dt">{</span><span class="dv">1</span><span class="dt">..</span><span class="dv">2</span><span class="dt">}</span><span class="kw">;</span> <span class="cf">do</span> <span class="ex">qemu-img</span> create <span class="at">-f</span> qcow2 <span class="at">-b</span> ubuntu-rdma.qcow2 vm<span class="va">${i}</span>.qcow2<span class="kw">;</span> <span class="cf">done</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> ls vm<span class="pp">*</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="ex">vm1.qcow2</span>  vm2.qcow2</span></code></pre></div>
+<p>Now we are going to run both guest. Each of them will have two network interfaces.
+The first interface is configured to allow access from the guest to the internet
+and to allow access from the host to the guest’s ssh service by connecting to
+local port 5551 (or 5552 for second vm). The second network interface will
+be used for rdma access we are going to use qemu’s feature to create network
+using UDP multicast socket.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="dt">{</span><span class="dv">1</span><span class="dt">..</span><span class="dv">2</span><span class="dt">}</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">do</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="ex">kvm</span> <span class="at">-name</span> vm<span class="va">${i}</span> <span class="at">-m</span> 1G <span class="dt">\</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>      <span class="at">-netdev</span> user,hostfwd=tcp::555<span class="va">${i}</span>-:22,id=net0 <span class="dt">\</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">-device</span> virtio-net-pci,netdev=net0 <span class="dt">\</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">-netdev</span> socket,mcast=230.0.0.1:1234,id=net1 <span class="dt">\</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">-device</span> virtio-net-pci,mac=52:54:00:12:34:0<span class="va">${i}</span>,netdev=net1 <span class="dt">\</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">-drive</span> if=virtio,file=vm<span class="va">${i}</span>.qcow2,cache=unsafe <span class="kw">&amp;</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span></code></pre></div>
 <p>Now login to each of the machines and set hostname and ip for the rdma nic:</p>
 <ul>
 <li>vm1</li>
 </ul>
-<div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="fu">ssh</span> -p 5551 localhost</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a><span class="ex">vm1</span> $ sudo bash -c <span class="st">'echo 127.0.0.1 vm1 &gt;&gt; /etc/hosts'</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a><span class="ex">vm1</span> $ sudo hostnamectl set-hostname vm1</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true"></a><span class="ex">vm1</span> $ sudo su</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true"></a><span class="ex">vm1</span> $ cat <span class="op">&lt;&lt; EOF</span> <span class="op">&gt;&gt;</span> <span class="ex">/etc/network/interfaces</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true"></a>auto ens4</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true"></a>iface ens4 inet <span class="op">s</span><span class="ex">tatic</span></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true"></a>  address 10.0.0.1</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true"></a>  netmask 255.255.255.0</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true"></a>EOF</span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true"></a>vm1 $ ifup ens4</span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true"></a>vm1 $ exit</span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true"></a>vm1 $ exit</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ssh</span> <span class="at">-p</span> 5551 localhost</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ex">vm1</span> $ sudo bash <span class="at">-c</span> <span class="st">'echo 127.0.0.1 vm1 &gt;&gt; /etc/hosts'</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="ex">vm1</span> $ sudo hostnamectl set-hostname vm1</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="ex">vm1</span> $ sudo su</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="ex">vm1</span> $ cat <span class="op">&lt;&lt; EOF</span> <span class="op">&gt;&gt;</span> /etc/network/interfaces</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="st">auto ens4</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="st">iface ens4 inet static</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="st">  address 10.0.0.1</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="st">  netmask 255.255.255.0</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="op">EOF</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="ex">vm1</span> $ ifup ens4</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="ex">vm1</span> $ exit</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="ex">vm1</span> $ exit</span></code></pre></div>
 <ul>
 <li>vm2</li>
 </ul>
-<div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a><span class="fu">ssh</span> -p 5552 localhost</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a><span class="ex">vm2</span> $ sudo bash -c <span class="st">'echo 127.0.0.1 vm2 &gt;&gt; /etc/hosts'</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a><span class="ex">vm2</span> $ sudo hostnamectl set-hostname vm2</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true"></a><span class="ex">vm2</span> $ sudo su</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true"></a><span class="ex">vm2</span> $ cat <span class="op">&lt;&lt; EOF</span> <span class="op">&gt;&gt;</span> <span class="ex">/etc/network/interfaces</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true"></a>auto ens4</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true"></a>iface ens4 inet <span class="op">s</span><span class="ex">tatic</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true"></a>  address 10.0.0.2</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true"></a>  netmask 255.255.255.0</span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true"></a>EOF</span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true"></a>vm2 $ ifup ens4</span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true"></a>vm2 $ exit</span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true"></a>vm2 $ exit</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ssh</span> <span class="at">-p</span> 5552 localhost</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">vm2</span> $ sudo bash <span class="at">-c</span> <span class="st">'echo 127.0.0.1 vm2 &gt;&gt; /etc/hosts'</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="ex">vm2</span> $ sudo hostnamectl set-hostname vm2</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="ex">vm2</span> $ sudo su</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="ex">vm2</span> $ cat <span class="op">&lt;&lt; EOF</span> <span class="op">&gt;&gt;</span> /etc/network/interfaces</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="st">auto ens4</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="st">iface ens4 inet static</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="st">  address 10.0.0.2</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="st">  netmask 255.255.255.0</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="op">EOF</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="ex">vm2</span> $ ifup ens4</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="ex">vm2</span> $ exit</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="ex">vm2</span> $ exit</span></code></pre></div>
 <p>Make sure that your host firewall is not blocking the udp broadcast over port 1234</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a>$ <span class="fu">sudo</span> iptables -A INPUT -p udp --dport 1234 -j ACCEPT</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo iptables <span class="at">-A</span> INPUT <span class="at">-p</span> udp <span class="at">--dport</span> 1234 <span class="at">-j</span> ACCEPT</span></code></pre></div>
 <h3 id="check-tcp-connectivity">Check tcp connectivity</h3>
-<div class="sourceCode" id="cb12"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true"></a><span class="ex">vm1</span> $ ping 10.0.0.2</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true"></a><span class="ex">PING</span> 10.0.0.2 (10.0.0.2) <span class="ex">56</span>(84) <span class="ex">bytes</span> of data.</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true"></a><span class="ex">64</span> bytes from 10.0.0.2: icmp_seq=1 ttl=64 time=0.671 ms</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true"></a><span class="ex">64</span> bytes from 10.0.0.2: icmp_seq=2 ttl=64 time=0.776 ms</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">vm1</span> $ ping 10.0.0.2</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">PING</span> 10.0.0.2 <span class="er">(</span><span class="ex">10.0.0.2</span><span class="kw">)</span> <span class="ex">56</span><span class="er">(</span><span class="ex">84</span><span class="kw">)</span> <span class="ex">bytes</span> of data.</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="ex">64</span> bytes from 10.0.0.2: icmp_seq=1 ttl=64 time=0.671 ms</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="ex">64</span> bytes from 10.0.0.2: icmp_seq=2 ttl=64 time=0.776 ms</span></code></pre></div>
 <h3 id="check-rdma-connectivity">Check RDMA connectivity</h3>
 <ul>
 <li>vm1</li>
 </ul>
-<div class="sourceCode" id="cb13"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true"></a><span class="ex">vm1</span> $ sudo modprobe -a siw rdma_ucm</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true"></a><span class="ex">vm1</span> $ rping -s -a 10.0.0.1 -v</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true"></a><span class="ex">server</span> ping data: rdma-ping-0: ABCDEFGHIJKLMNOPQRSTUVWXYZ[<span class="dt">\]</span>^_<span class="kw">`</span><span class="ex">abcdefghijklmnopqr</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true"></a><span class="ex">server</span> ping data: rdma-ping-1: BCDEFGHIJKLMNOPQRSTUVWXYZ[<span class="dt">\]</span>^_<span class="kw">`</span>abcdefghijklmnopqrs</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true"></a><span class="ex">server</span> DISCONNECT EVENT...</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true"></a><span class="bu">wait</span> for RDMA_READ_ADV state 10</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">vm1</span> $ sudo modprobe <span class="at">-a</span> siw rdma_ucm</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="ex">vm1</span> $ rping <span class="at">-s</span> <span class="at">-a</span> 10.0.0.1 <span class="at">-v</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="ex">server</span> ping data: rdma-ping-0: ABCDEFGHIJKLMNOPQRSTUVWXYZ[<span class="dt">\]</span>^_<span class="kw">`</span><span class="ex">abcdefghijklmnopqr</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="ex">server</span> ping data: rdma-ping-1: BCDEFGHIJKLMNOPQRSTUVWXYZ[<span class="dt">\]</span>^_<span class="kw">`</span>abcdefghijklmnopqrs</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="ex">server</span> DISCONNECT EVENT...</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="bu">wait</span> for RDMA_READ_ADV state 10</span></code></pre></div>
 <ul>
 <li>vm2</li>
 </ul>
-<div class="sourceCode" id="cb14"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true"></a><span class="ex">vm2</span> $ sudo modprobe -a siw rdma_ucm</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true"></a><span class="ex">vm2</span> $ rping -c -a 10.0.0.1 -C 2 -v</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true"></a><span class="fu">ping</span> data: rdma-ping-0: ABCDEFGHIJKLMNOPQRSTUVWXYZ[<span class="dt">\]</span>^_<span class="kw">`</span><span class="ex">abcdefghijklmnopqr</span></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true"></a><span class="fu">ping</span> data: rdma-ping-1: BCDEFGHIJKLMNOPQRSTUVWXYZ[<span class="dt">\]</span>^_<span class="kw">`</span>abcdefghijklmnopqrs</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ex">vm2</span> $ sudo modprobe <span class="at">-a</span> siw rdma_ucm</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="ex">vm2</span> $ rping <span class="at">-c</span> <span class="at">-a</span> 10.0.0.1 <span class="at">-C</span> 2 <span class="at">-v</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ping</span> data: rdma-ping-0: ABCDEFGHIJKLMNOPQRSTUVWXYZ[<span class="dt">\]</span>^_<span class="kw">`</span><span class="ex">abcdefghijklmnopqr</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ping</span> data: rdma-ping-1: BCDEFGHIJKLMNOPQRSTUVWXYZ[<span class="dt">\]</span>^_<span class="kw">`</span>abcdefghijklmnopqrs</span></code></pre></div>
 <h3 id="check-rdma-bandwidth-and-latency">Check RDMA bandwidth and latency</h3>
 <h4 id="bandwidth">Bandwidth</h4>
 <ul>
 <li>vm1</li>
 </ul>
-<div class="sourceCode" id="cb15"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true"></a><span class="ex">vm1</span> $ ibv_devices</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true"></a>    <span class="ex">device</span>          	   node GUID</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true"></a>    <span class="ex">------</span>          	----------------</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true"></a>    <span class="ex">siw_ens3</span>        	5254001234560000</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true"></a>    <span class="ex">siw_lo</span>          	7369775f6c6f0000</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true"></a>    <span class="ex">siw_ens4</span>        	5254001234010000</span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true"></a><span class="ex">vm1</span> $ sudo su</span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true"></a><span class="ex">vm1</span> $ ulimit -l unlimited</span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true"></a><span class="ex">vm1</span> $ ib_write_bw -R -d siw_ens4 -i 1  -D 10 -F</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ex">vm1</span> $ ibv_devices</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    <span class="ex">device</span>          	   node GUID</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    <span class="ex">------</span>          	<span class="at">----------------</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    <span class="ex">siw_ens3</span>        	5254001234560000</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    <span class="ex">siw_lo</span>          	7369775f6c6f0000</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    <span class="ex">siw_ens4</span>        	5254001234010000</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="ex">vm1</span> $ sudo su</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="ex">vm1</span> $ ulimit <span class="at">-l</span> unlimited</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="ex">vm1</span> $ ib_write_bw <span class="at">-R</span> <span class="at">-d</span> siw_ens4 <span class="at">-i</span> 1  <span class="at">-D</span> 10 <span class="at">-F</span></span></code></pre></div>
 <ul>
 <li>vm2</li>
 </ul>
-<div class="sourceCode" id="cb16"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true"></a><span class="ex">vm2</span> $ sudo su</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true"></a><span class="ex">vm2</span> $ ulimit -l unlimited</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true"></a><span class="ex">vm2</span> $ ib_write_bw -R -d siw_ens4 -i 1 -D 10 -F 10.0.0.1</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true"></a><span class="ex">...</span></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true"></a> <span class="co">#bytes     #iterations    BW peak[MB/sec]    BW average[MB/sec]   MsgRate[Mpps]</span></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true"></a> <span class="ex">65536</span>      3200             0.00               33.33  		   0.000533</span></code></pre></div>
-<p>The results are really lame but please remember we are using virtual environment so performance is always bad here</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ex">vm2</span> $ sudo su</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="ex">vm2</span> $ ulimit <span class="at">-l</span> unlimited</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="ex">vm2</span> $ ib_write_bw <span class="at">-R</span> <span class="at">-d</span> siw_ens4 <span class="at">-i</span> 1 <span class="at">-D</span> 10 <span class="at">-F</span> 10.0.0.1</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a> <span class="co">#bytes     #iterations    BW peak[MB/sec]    BW average[MB/sec]   MsgRate[Mpps]</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a> <span class="ex">65536</span>      3200             0.00               33.33  		   0.000533</span></code></pre></div>
+<p>The results are really lame but please remember we are using
+virtual environment so performance is always bad here</p>
 <h4 id="latency">Latency</h4>
 <ul>
 <li>vm1</li>
 </ul>
-<div class="sourceCode" id="cb17"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true"></a><span class="ex">vm1</span> $ ib_write_lat -R -d siw_ens4 -i 1  -D 10 -F</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ex">vm1</span> $ ib_write_lat <span class="at">-R</span> <span class="at">-d</span> siw_ens4 <span class="at">-i</span> 1  <span class="at">-D</span> 10 <span class="at">-F</span></span></code></pre></div>
 <ul>
 <li>vm2</li>
 </ul>
-<div class="sourceCode" id="cb18"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true"></a><span class="ex">vm2</span> $ ib_write_lat -R -d siw_ens4 -i 1 -D 10 -F 10.0.0.1</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true"></a><span class="ex">...</span></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true"></a> <span class="co">#bytes        #iterations       t_avg[usec]</span></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true"></a> <span class="ex">2</span>             4316            695.11</span></code></pre></div>
-<p>Same lame results due to the nature of our virtual setup and the use of softiwarp instead of real RDMA capable hardware</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="ex">vm2</span> $ ib_write_lat <span class="at">-R</span> <span class="at">-d</span> siw_ens4 <span class="at">-i</span> 1 <span class="at">-D</span> 10 <span class="at">-F</span> 10.0.0.1</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a> <span class="co">#bytes        #iterations       t_avg[usec]</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a> <span class="ex">2</span>             4316            695.11</span></code></pre></div>
+<p>Same lame results due to the nature of our virtual setup and the use of
+softiwarp instead of real RDMA capable hardware</p>
 <h2 id="summary">Summary</h2>
-<p>Now we have a working setup of two vm’s which can communicate using RDMA. In the next posts we are going to explore more interesting RDMA stuff.</p>
+<p>Now we have a working setup of two vm’s which can communicate using RDMA. In
+the next posts we are going to explore more interesting RDMA stuff.</p>
 
 
     <div style="clear: both"></div>
