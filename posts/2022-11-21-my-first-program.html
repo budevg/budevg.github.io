@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width">
+    <link rel="icon" type="image/png" href="../static/images/pencil.ico">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <title>Evgeny Budilovsky - Writing my first program, 28 years after</title>
+
+    <!-- Stylesheets. -->
+    <link rel="stylesheet" type="text/css" href="../style.css?v=0">
+
+    <!-- RSS. -->
+    <link rel="alternate" type="application/rss+xml" title="Evgeny Budilovsky - a personal blog" href="../rss.xml">
+
+    <!-- Metadata. -->
+    <meta name="keywords" content="Evgeny Budilovsky,blog,programming,coding,linux,functional programming,personal,homepage,kernel,storage,network,virtualization,cloud">
+    <meta name="description" content="Personal home page and blog of Evgeny Budilovsky">
+  </head>
+  <body>
+    <div id="navigation">
+      <h1>Blog</h1>
+      <a href="../">Home</a>
+      <a href="../posts.html">Posts</a>
+      <h1>Links</h1>
+      <a href="http://github.com/budevg">
+        <i class="fa fa-github github-color" aria-hidden="true"></i>
+        GitHub
+      </a>
+      <a href="http://twitter.com/budevg">
+        <i class="fa fa-twitter twitter-color" aria-hidden="true"></i>
+        Twitter
+      </a>
+      <a href="https://www.linkedin.com/in/budevg">
+        <i class="fa fa-linkedin linkedin-color" aria-hidden="true"></i>
+        LinkedIn
+      </a>
+      <a type="application/rss+xml" href="../rss.xml">
+        <i class="fa fa-rss rss-color" aria-hidden="true"></i>
+        RSS
+      </a>
+    </div>
+
+    <div id="content">
+    <h1>Writing my first program, 28 years after</h1>
+<div class="soft">
+    Let's go back to 1994 and write my first program<br />
+    Published on November 21, 2022 under the tag <a title="All pages tagged 'programming'." href="../tags/programming.html">programming</a>, <a title="All pages tagged 'qemu'." href="../tags/qemu.html">qemu</a>
+</div>
+
+<p>If you are a programmer then you probably remember the first time that you wrote
+an actual program. It probably wasn’t sophisticated piece of software. Maybe you
+just copied some chunk of code and ran it to see the effect. Maybe you changed
+some lines or played with variables. The first things we do are the most
+influential for our life.</p>
+<p>For me the year was 1994 and I had an 486 pc which I used as most other kids to
+play games. I think I got the source code on piece of paper from some
+programming book or maybe a file from my friend. It was written in QBasic and
+after copying line by line all the code and running it, the result was a
+sequence of colored dots displayed on my screen. Amazing !!! Let’s try and
+recreate this nostalgic experience.</p>
+<p>First we need to install msdos. I think I was running msdos 5.0 at that time.</p>
+<p>Let’s download <a href="https://winworldpc.com/product/ms-dos/50">msdos 5.0</a>. First link
+<a href="https://dl.winworldpc.com/Microsoft%20MS-DOS%205.00%20(3.5-720k).7z">Microsoft MS-DOS 5.00 (3.5-720k)</a>
+promises .7z file.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> wget <span class="at">-q</span> <span class="st">'https://dl.winworldpc.com/Microsoft%20MS-DOS%205.00%20(3.5-720k).7z'</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> ls</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="st">'Microsoft MS-DOS 5.00 (3.5-720k).7z'</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> 7z e <span class="st">'Microsoft MS-DOS 5.00 (3.5-720k).7z'</span> <span class="op">&gt;</span> /dev/null</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> ls <span class="pp">*</span>.img</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ex">Disk01.img</span>  Disk02.img  Disk03.img</span></code></pre></div>
+<p>We will use qemu to emulate our hardware. I don’t remember the exact spec of my
+pc. But according to this <a href="http://www.dosdays.co.uk/topics/1994.php">1994 pc</a>,
+486DX2 was coming with 8MB of RAM and 320 MB disk size.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> qemu-img create <span class="at">-f</span> raw msdos.disk 320M</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">Formatting</span> <span class="st">'msdos.disk'</span>, fmt=raw size=335544320</span></code></pre></div>
+<p>Now let’s run our system and install msdos5.0</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">qemu-system-i386</span> <span class="at">-m</span> 8M <span class="at">-hda</span> msdos.disk <span class="at">-L</span> . <span class="at">-fda</span> Disk01.img <span class="at">-boot</span> a</span></code></pre></div>
+<p>Installing msdos is pretty easy. Just press enter, enter, enter, enter 4 times
+(choosing the default options). The msdos will format the disk. It will install
+the first floppy from three floppies and ask to insert the second one. To do
+this you can switch to qemu monitor (using Ctrl+Alt+2), where you can use the
+following command to switch the floppy image.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">(</span><span class="ex">qemu</span><span class="kw">)</span> <span class="ex">change</span> floppy0 Disk02.img</span></code></pre></div>
+<p>Then go back to the display (Ctrl+Alt+1) and press enter. Repeat same sequence
+for the third disk (<code>change floppy0 Disk03.img</code>). When the prompt asks to remove
+all floppy disks you can switch to qemu monitor and run <code>eject floppy0</code>. Then
+press enter and the msdos 5.0 will start from hard disk.</p>
+<p>You can press <code>Shift+f9</code> to enter the command prompt and then just type
+<code>qbasic.exe</code> to enter the qbasic program.</p>
+<p>Press ESC to clear screen and then write the program</p>
+<pre class="bas"><code>SCREEN 1
+FOR x = 0 TO 10
+  FOR y= 0 TO x
+    PSET (x * 10, y * 10), RND * 2 + 1
+    t0 = TIMER
+    DO
+    LOOP UNTIL TIMER - t0 &gt; .1
+  NEXT
+NEXT</code></pre>
+<p>After that pressing F5 will run the amazing program which will display colorful
+dots in the shape of triangular.</p>
+<p>This was the start of my programming adventure. First steps always look so
+simple after you walked for a long time.</p>
+<center>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/D7NJKtSHr-A" frameborder="0" allowfullscreen>
+</iframe>
+</center>
+
+
+    <div style="clear: both"></div>
+
+    <div id="footer">
+    </div>
+</div>
+
+  </body>
+</html>
